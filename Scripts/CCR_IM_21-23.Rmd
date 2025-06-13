@@ -40,7 +40,7 @@ chem <- read_csv("https://pasta.lternet.edu/package/data/eml/edi/199/12/a33a5283
 
 ```
 
-## PPCPs
+## PPCPs Detect freq
 Making detection frequency plots 
 THIS IS FOR ABOVE LIMIT OF DETECTION!!
 
@@ -63,128 +63,51 @@ detect |>
   scale_fill_manual(values=c("#E69F00", "#56B4E9", "#009E73"))
 
 
-#rying before and after
+#trying before and after
 detect |> 
   select(-DEET) %>%
-  filter(Detection_frequency == "Full_year") |> 
+  filter(Detection_frequency != "Full_year") |> 
+  mutate(Detection_frequency = ifelse(Detection_frequency == "Pre", "Before", Detection_frequency)) |> 
   pivot_longer(-c(1:3), names_to = "PPCP", values_to = "value") |> 
   mutate(value = value*100) |> 
-  ggplot(aes(x = as.factor(Year), y = value, fill = PPCP)) +
-  geom_bar(stat = "identity", width = 0.75)+
+  ggplot(aes(x = as.factor(Year), y = value, fill = Detection_frequency)) +
+  geom_bar(stat = "identity", width = 0.75, position =  position_dodge(width = 0.75)) +  
   facet_wrap(~PPCP, nrow = 1)+
-  labs(x = element_blank(), 
+  labs(x = element_blank(), fill = "Sampling Time",
        y = "% of Samples above LLOD")+
+  # geom_text(aes(y = 50, label = paste("n", "=", sample_size, sep = "\n"),
+  #             x = as.factor(Year), fill = Detection_frequency),
+  #         position = position_dodge(width = 0.75),  size = 4)+
+    geom_text(aes(y = 5, label = sample_size,
+              x = as.factor(Year)),
+          position = position_dodge(width = 0.75),  size = 4)+
   theme_classic()+ theme(legend.position = "top",
-        axis.text=element_text(size=14), axis.title=element_text(size=14,face="bold"))+
-  scale_fill_manual(values=c("#E69F00", "#56B4E9", "#009E73"))
+        axis.text=element_text(size=14), axis.title=element_text(size=14,face="bold"))
+
+#another version
+detect |> 
+  select(-DEET) %>%
+  filter(Detection_frequency != "Full_year") |> 
+  mutate(Detection_frequency = ifelse(Detection_frequency == "Pre", "Before", Detection_frequency)) |> 
+  pivot_longer(-c(1:3), names_to = "PPCP", values_to = "value") |> 
+  mutate(value = value*100) |> 
+  ggplot(aes(x = Detection_frequency, y = value, fill = as.factor(Year))) +
+  geom_bar(stat = "identity", width = 0.75, position =  position_dodge(width = 0.75)) +  
+  facet_wrap(~PPCP, nrow = 1)+
+  labs(x = element_blank(), fill = "Year",
+       y = "% of Samples above LLOD")+
+    geom_text(aes(y = 5, label = sample_size,
+              x = Detection_frequency, fill = as.factor(Year)),
+          position = position_dodge(width = 0.75),  size = 4)+
+  theme_classic()+ theme(legend.position = "top",
+        axis.text=element_text(size=14), axis.title=element_text(size=14,face="bold"))
 
 
 
 ```
 
 
-```{r}
-acet_detect_21 <- (5/18)*100 
-caff_detect_21 <- (18/18)*100
-DEET_detect_21 <- (18/18)*100
-Tric_detect_21 <- (14/18)*100
-
-acet_detect_22 <- (3/24)*100
-caff_detect_22 <- (24/24)*100
-DEET_detect_22 <- (24/24)*100
-Tric_detect_22 <- (0/24)*100
-
-#!!!! Update 2023
-acet_detect_23 <- (0/24)*100
-caff_detect_23 <- (23/24)*100
-DEET_detect_23 <- NA
-Tric_detect_23 <- (10/24)*100
-
-  
-detectfreq <- data.frame(ppcp = c("Acetaminophen", "Triclosan", "Caffeine", "DEET"),
-                         detection_21 = c(acet_detect_21, Tric_detect_21, caff_detect_21, DEET_detect_21),
-                         detection_22 = c(acet_detect_22, Tric_detect_22, caff_detect_22, DEET_detect_22),
-                         detection_23 = c(acet_detect_23, Tric_detect_23, caff_detect_23, DEET_detect_23))
-
-detectfreq_long <- detectfreq %>% 
-  pivot_longer(c(2:4))
-
-detectfreq_long %>% 
-  mutate(year = ifelse(name == "detection_21", 2021, NA),
-         year = ifelse(name == "detection_22", 2022, year),
-         year = ifelse(name == "detection_23", 2023, year)) %>% 
-  filter(!ppcp == "DEET") %>%
-  ggplot(aes(x = as.factor(year), y = value, fill = ppcp)) +
-  geom_bar(stat = "identity", width = 0.75)+
-  facet_wrap(~ppcp, nrow = 1)+
-  labs(x = element_blank(), fill = "PPCP",
-       y = "% of Samples above LLOD")+
-  theme_classic()+ theme(legend.position = "top",
-        axis.text=element_text(size=14), axis.title=element_text(size=14,face="bold"))+
-  scale_fill_manual(values=c("#E69F00", "#56B4E9", "#009E73"))
-
-
-```
-
-Fig 2 by pre and post 
-
-```{r}
-#2021
-acet_detect_21_before <- (0/6)*100 
-acet_detect_21_after <- (5/12)*100 
-
-tric_detect_21_before <- (3/6)*100
-tric_detect_21_after <- (11/12)*100
-
-caf_detect_21_before <- (6/6)*100
-caf_detect_21_after <- (12/12)*100
-
-#2022
-acet_detect_22_before <- (0/6)*100
-acet_detect_22_after <- (3/18)*100
-
-caf_detect_22_before <- (6/6)*100
-caf_detect_22_after <- (18/18)*100
-
-tric_detect_22_before <- (0/6)*100
-tric_detect_22_after <- (0/18)*100
-
-#2023
-acet_detect_23_before <- (0/6)*100
-acet_detect_23_after <- (0/18)*100
-
-caf_detect_23_before <- (6/6)*100
-caf_detect_23_after <- (17/18)*100
-
-tric_detect_23_before <- (0/6)*100
-tric_detect_23_after <- (10/18)*100
-
-  
-detectfreq <- data.frame(ppcp = c("Acetaminophen", "Triclosan", "Caffeine"),
-                         detection_21_before = c(acet_detect_21_before, Tric_detect_21_before, caff_detect_21_before),
-                         detection_22_before = c(acet_detect_22_before, Tric_detect_22_before, caff_detect_22_before),
-                         detection_23_before = c(acet_detect_23_before, Tric_detect_23_before, caff_detect_23_before))
-
-detectfreq_long <- detectfreq %>% 
-  pivot_longer(c(2:4))
-
-detectfreq_long %>% 
-  mutate(year = ifelse(name == "detection_21", 2021, NA),
-         year = ifelse(name == "detection_22", 2022, year),
-         year = ifelse(name == "detection_23", 2023, year)) %>% 
-  filter(!ppcp == "DEET") %>%
-  ggplot(aes(x = as.factor(year), y = value, fill = ppcp)) +
-  geom_bar(stat = "identity", width = 0.75)+
-  facet_wrap(~ppcp, nrow = 1)+
-  labs(x = element_blank(), fill = "PPCP",
-       y = "% of Samples above LLOD")+
-  theme_classic()+ theme(legend.position = "top",
-        axis.text=element_text(size=14), axis.title=element_text(size=14,face="bold"))+
-  scale_fill_manual(values=c("#E69F00", "#56B4E9", "#009E73"))
-
-
-```
-
+## Read in PPCP concentrations
 
 read in and line up PPCP data
 
@@ -211,7 +134,94 @@ ppcp_forplotting <- ppcp21_23 %>%
 ```
 
 
-PPCP plots format 
+
+## New PPCP trials 
+
+```{r}
+head(ppcp_forplotting)
+
+#CAF 
+ppcp_forplotting |> 
+  mutate(Pre_Post = ifelse(FakeDate < ymd("2030-06-03"), "Before", "Post")) |> 
+  ggplot(aes(x = factor(Year), y = CAF_ngL, fill = Pre_Post)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  geom_jitter(alpha = 0.5, position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.8))+
+  labs(x = "Year", y = "CAF (ng/L)", fill = "Period") +
+  scale_y_log10()+
+  #facet_wrap(~Site_number)+
+  theme_minimal()
+
+ppcp_forplotting |> 
+  filter(Site_number == 3) |> 
+  mutate(Pre_Post = ifelse(FakeDate < ymd("2030-06-03"), "Before", "Post")) |> 
+  ggplot(aes(x = factor(Year), y = CAF_ngL, fill = Pre_Post)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  geom_jitter(alpha = 0.5, position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.8))+
+  labs(x = "Year", y = "CAF (ng/L)", fill = "Period") +
+  scale_y_log10()+
+  theme_minimal()
+
+
+
+#variable faceting 
+ppcp_forplotting |> 
+  mutate(Pre_Post = ifelse(FakeDate < ymd("2030-06-03"), "Before", "Post")) |> 
+  select(Year, Site_number, Pre_Post, ACT_ngL, CAF_ngL, TCS_ngL ) |> 
+  pivot_longer(-c(1:3), values_to = "conc_ngL", names_to = "PPCP") |>
+  #mutate(conc_ngL = ifelse(conc_ngL == 0, 0.1, conc_ngL)) |> 
+  ggplot(aes(x = factor(Year), y = conc_ngL, fill = Pre_Post)) +
+  geom_boxplot(
+               position = position_dodge2(width = 0.8, preserve = "single")
+               ) +
+  geom_jitter(alpha = 0.5, position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.8))+
+  labs(x = "Year", y = "Concentration (ng/L)", fill = "Period") +
+  facet_wrap(~PPCP, nrow = 1)+
+  scale_y_log10()+
+  theme_bw()
+
+
+#facet by year and variable 
+ppcp_forplotting |> 
+  mutate(Pre_Post = ifelse(FakeDate < ymd("2030-06-03"), "Before", "Post")) |> 
+  select(Year, Site_number, Pre_Post, ACT_ngL, CAF_ngL, TCS_ngL ) |> 
+  pivot_longer(-c(1:3), values_to = "conc_ngL", names_to = "PPCP") |>
+  ggplot(aes(x = Pre_Post, y = conc_ngL, fill = Pre_Post)) +
+  geom_boxplot(
+               #position = position_dodge2(width = 0.8, preserve = "single")
+               ) +
+  geom_jitter(alpha = 0.5, shape = 2, position = position_jitterdodge(jitter.width = 0.3, dodge.width = 0.8))+
+  labs(x = "Time", y = "Concentration (ng/L)", fill = "Sampling Time") +
+  facet_grid(PPCP~Year, scales = "free_y")+
+  scale_y_log10()+
+  theme_bw()+ theme(legend.position = "top")
+  
+
+
+
+```
+
+post swimming
+
+```{r}
+ppcp_forplotting |> 
+  mutate(Pre_Post = ifelse(FakeDate < ymd("2030-06-03"), "Before", "Post")) |> 
+  filter(Pre_Post == "Post") |> 
+  ggplot(aes(x= as.factor(Site_number), y = ACT_ngL, color = as.factor(Year)))+
+  # geom_boxplot()+
+  #geom_point()+
+   geom_jitter(size = 3, width = 0.1)+
+  scale_y_log10()+
+  theme_bw()+ theme(legend.position = "right",
+        axis.text=element_text(size=14), axis.title=element_text(size=14,face="bold"))
+
+
+
+
+
+```
+
+
+## PPCP timeseries
 
 ```{r}
 
@@ -316,76 +326,7 @@ ppcp_forplotting %>%
 
 ```
 
-## New PPCP trials 
 
-```{r}
-head(ppcp_forplotting)
-
-#CAF 
-ppcp_forplotting |> 
-  mutate(Pre_Post = ifelse(FakeDate < ymd("2030-06-03"), "Before", "Post")) |> 
-  ggplot(aes(x = factor(Year), y = CAF_ngL, fill = Pre_Post)) +
-  geom_boxplot(position = position_dodge(width = 0.8)) +
-  geom_jitter(alpha = 0.5, position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.8))+
-  labs(x = "Year", y = "CAF (ng/L)", fill = "Period") +
-  scale_y_log10()+
-  #facet_wrap(~Site_number)+
-  theme_minimal()
-
-ppcp_forplotting |> 
-  filter(Site_number == 3) |> 
-  mutate(Pre_Post = ifelse(FakeDate < ymd("2030-06-03"), "Before", "Post")) |> 
-  ggplot(aes(x = factor(Year), y = CAF_ngL, fill = Pre_Post)) +
-  geom_boxplot(position = position_dodge(width = 0.8)) +
-  geom_jitter(alpha = 0.5, position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.8))+
-  labs(x = "Year", y = "CAF (ng/L)", fill = "Period") +
-  scale_y_log10()+
-  theme_minimal()
-
-#ACT
-ppcp_forplotting |> 
-  mutate(Pre_Post = ifelse(FakeDate < ymd("2030-06-03"), "Before", "Post")) |> 
-  ggplot(aes(x = factor(Year), y = ACT_ngL, fill = Pre_Post)) +
-  geom_boxplot(position = position_dodge(width = 0.8)) +
-  geom_jitter(alpha = 0.5, position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.8))+
-  labs(x = "Year", y = "ACT (ng/L)", fill = "Period") +
-  #facet_wrap(~Site_number)+
-  theme_minimal()
-
-#TCS
-ppcp_forplotting |> 
-  mutate(Pre_Post = ifelse(FakeDate < ymd("2030-06-03"), "Before", "Post")) |> 
-  ggplot(aes(x = factor(Year), y = TCS_ngL, fill = Pre_Post)) +
-  geom_boxplot(position = position_dodge(width = 0.8)) +
-  geom_jitter(alpha = 0.5, position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.8))+
-  labs(x = "Year", y = "TCS (ng/L)", fill = "Period") +
-  #facet_wrap(~Site_number)+
-  scale_y_log10()+
-  theme_minimal()
-
-
-
-#variable faceting 
-ppcp_forplotting |> 
-  mutate(Pre_Post = ifelse(FakeDate < ymd("2030-06-03"), "Before", "Post")) |> 
-  select(Year, Site_number, Pre_Post, ACT_ngL, CAF_ngL, TCS_ngL ) |> 
-  pivot_longer(-c(1:3), values_to = "conc_ngL", names_to = "PPCP") |>
-  mutate(conc_ngL = ifelse(conc_ngL == 0, 0.1, conc_ngL)) |> 
-  ggplot(aes(x = factor(Year), y = conc_ngL, fill = Pre_Post)) +
-  geom_boxplot(
-               position = position_dodge2(width = 0.8, preserve = "single")
-               ) +
-  geom_jitter(alpha = 0.5, position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.8))+
-  labs(x = "Year", y = "Concentration (ng/L)", fill = "Period") +
-  facet_wrap(~PPCP, nrow = 1)+
-  scale_y_log10()+
-  theme_bw()
-
-  
-
-
-
-```
 
 
 
