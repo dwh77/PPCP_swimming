@@ -9,47 +9,33 @@ output: html_document
 
 ```{r, include=FALSE}
 library(tidyverse)
-
-#library(climaemet) #for wind rose
-# library(plotly) #for making ggplot interactive in "Viewer" window
-# library(scales)
-# library(patchwork)
+library(Rmisc) #summarySE
 
 ```
-
-Set up dates
-```{r}
-
-race_dates <- c(ymd("2021-06-06"), ymd("2022-06-05"), ymd("2023-06-04"))
-
-dates_21 <- c(ymd("2021-06-01"), ymd("2021-06-06"), ymd("2021-06-09"))
-dates_22 <- c(ymd("2022-06-02"), ymd("2022-06-06"), ymd("2022-06-09"), ymd("2022-07-07"))
-dates_23 <- c(ymd("2023-06-01"), ymd("2023-06-04"), ymd("2023-06-07"), ymd("2023-06-29"))
-
-
-```
-
 
 ## PPCPs Detect freq
-Making detection frequency plots 
-THIS IS FOR ABOVE LIMIT OF DETECTION!!
+Making detection frequency plots for values > LLOD 
 
 ```{r}
 detect <- read.csv("../Data/Detection_frequency_plotting.csv")
 
+ppcp_levels <- c("Acetaminophen", "Triclosan", "Caffeine")
+
 #before vs after
 detect |> 
+  dplyr::rename(Acetaminophen = ACT,
+         Caffeine = CAF,
+         Triclosan = TCS) |> 
   filter(Detection_frequency != "Full_year") |> #remove rows for full year %s
-  mutate(Detection_frequency = ifelse(Detection_frequency == "Pre", "Before", Detection_frequency)) |> 
   pivot_longer(-c(1:3), names_to = "PPCP", values_to = "value") |> 
   mutate(value = value*100) |> #change to %
   mutate(value = ifelse(value == 0, value + 0.5, value)) |> ## add .5 so 0% shows on bars
-  ggplot(aes(x = as.factor(Year), y = value, fill = Detection_frequency)) +
+  ggplot(aes(x = as.factor(Year), y = value, fill = factor(Detection_frequency, levels = c("Pre", "Post")))) +
   geom_bar(stat = "identity", width = 0.75, position =  position_dodge(width = 0.75)) +  
-  facet_wrap(~PPCP, nrow = 1)+
+  facet_wrap(~factor(PPCP, ppcp_levels), nrow = 1)+
   labs(x = "Sampling Year", fill = "Sampling Time",
        y = "% of Samples above LLOD")+
-   theme_classic()+ theme(legend.position = "top",
+   theme_classic()+ theme(legend.position = "top", text = element_text(size = 14),
         axis.text=element_text(size=14), axis.title=element_text(size=14,face="bold"))+
   scale_fill_manual(values=c("#E1BE6a", "#40B0A6"))
   #scale_fill_manual(values=c("#E66100", "#5D3A9B"))
@@ -58,78 +44,62 @@ detect |>
 
 ```
 
+## Code from Austin
 
-## Read in PPCP concentrations
-
-read in and line up PPCP data
-
-```{r}
-ppcp21_23 <- read.csv("../Data/ppcp_plotting.csv")
-
-ppcp_forplotting <- ppcp21_23 |> 
-  mutate(Date = mdy(Date)) |> 
-  rename(ACT = ACT_ngL,
-         TCS = TCS_ngL,
-         CAF = CAF_ngL) |> 
-  pivot_longer(-c(1:4), names_to = "PPCP") |> 
-    #set <LLOD to NA and make values numeric
-  mutate(value = ifelse(value %in% c("<LLOD"), NA, value),
-         value = as.numeric(value)) |> 
-    #convert value from ng/L to ug/L
-  mutate(value = value/1000) |> 
-  rename(conc_ugL = value) 
-
-```
-
-
-## New PPCP trials 
+Read in data and summary stats 
 
 ```{r}
 
-#### facet by year and variable 
+PPCP2<- read.csv("../Data/PPCP4.csv",header=T,sep=",")
+PPCP2
 
-ppcp_forplotting |> 
-  filter(Sampling_day < 4) |> 
-  mutate(Pre_Post = ifelse(Sampling_day == 1, "Before", NA),
-         Pre_Post = ifelse(Sampling_day == 2, "Day of Race", Pre_Post),
-         Pre_Post = ifelse(Sampling_day == 3, "Post", Pre_Post)) |> 
-  ggplot(aes(x = Pre_Post, y = conc_ugL, fill = Pre_Post)) +
-  #ggforce::geom_sina()+
-  geom_jitter(alpha = 1, shape = 19, position = position_jitterdodge(jitter.width = 0.3, dodge.width = 0.8))+
-   stat_summary(fun = mean, color = "steelblue", position = position_dodge(0.75), alpha = 1,
-                geom = "point", shape = 18, size = 4,  show.legend = FALSE) +
-  labs(x = "Sampling Time", y = "Concentration (ug/L)") +
-  facet_grid(PPCP~Year, scales = "fixed")+
-   scale_y_log10()+
-  theme_bw()+ theme(legend.position = "empty")
-  
 
+#####Summary stats years compiled#####  ###all data post the race day ("After") is compiled together####
+PPCPsum <- summarySE(data = PPCP2,"Conc2", groupvars=c("Sampling.Time","Drug"))
+PPCPsum #concn in ug/L##
+
+
+##SUMMARY STATS SEPARATED BY YEAR, DRUG, SAMPLING POINT###
+PPCPsum1<- summarySE(data = PPCP2,"Conc2", groupvars=c("Sampling.Time","Drug","Year"))
+PPCPsum1
+
+PPCPsum1 |> filter(Drug == "CAF")
+
+#yearly 
+summarySE(data = PPCP2,"Conc2", groupvars=c("Drug","Year"))
+
+
+summarySE(data = PPCP2,"Conc2", groupvars=c("Sampling.Time","Drug"))
 
 
 ```
 
-
-mean by years and time 
-
+Plot for figure 3
 
 ```{r}
 
-#by sample day: average across sites: color by year 
-ppcp_forplotting |> 
-  group_by(Year, Sampling_day, PPCP) |> 
-  summarise(conc_mean = mean(conc_ugL, na.rm = T)) |> 
-  mutate(Pre_Post = ifelse(Sampling_day == 1, "Before", NA),
-         Pre_Post = ifelse(Sampling_day == 2, "Race", Pre_Post),
-         Pre_Post = ifelse(Sampling_day == 3, "Post1", Pre_Post),
-         Pre_Post = ifelse(Sampling_day == 4, "Post2", Pre_Post)) |>
-  ggplot(aes(x = factor(Pre_Post, levels = c("Before", "Race", "Post1", "Post2")), y = conc_mean, colour = as.factor(Year)))+
-  geom_point(size = 2)+
-  facet_wrap(~PPCP, nrow = 1)+
-  scale_y_log10()+
-  labs(x = "Sampling Time", y = "Mean Concentration (ug/L)") +
-  theme_bw()+ theme(legend.position = "top")
-  
-  
+#revised with ug levels 
+PPCP2 |> 
+  dplyr::mutate(Drug = ifelse(Drug == "ACT", "Acetaminophen", Drug),
+         Drug = ifelse(Drug == "TCS", "Triclosan", Drug),
+         Drug = ifelse(Drug == "CAF", "Caffeine", Drug)
+                  ) |>
+  dplyr::mutate(Sampling_Time = ifelse(Sampling.Time == "Before", "Pre", Sampling.Time),
+                Sampling_Time = ifelse(Sampling.Time == "After ", "Post", Sampling_Time)
+         ) |> 
+ggplot(aes(x = factor(Sampling_Time, level=c('Pre', 'During', 'Post')), y=Conc2 )) +
+  geom_boxplot()+
+  geom_dotplot(binaxis='y', stackdir='center', dotsize = 1.5)+
+  facet_grid(factor(Drug, levels = ppcp_levels)~Year)+
+  scale_y_continuous(trans='log10')+
+  labs( y = expression(bold("Concentration ( "*mu*"g/L)")),
+       x = "Sampling Time")+
+   theme_bw()+ theme(legend.position = "top", text = element_text(size = 14),
+                      panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        axis.text=element_text(size=14), axis.title=element_text(size=14,face="bold"))+
+  stat_summary(fun.y=mean, geom="point", shape=23,
+                   size=3, color="black", fill = "red3")
+
 
 ```
 
@@ -145,25 +115,25 @@ race_days_fakedate <- data.frame(
 )
 
 
-## facet by variable and year
-
-ppcp_forplotting |> 
-  mutate(FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))) |> 
-  mutate(Site_name = ifelse(Site == 1, "Race Start", NA),
-         Site_name = ifelse(Site == 2, "Race 2", Site_name),
-         Site_name = ifelse(Site == 3, "Race 3", Site_name),
-         Site_name = ifelse(Site == 4, "Race Finish", Site_name),
-         Site_name = ifelse(Site == 5, "Downstream 1", Site_name),
-         Site_name = ifelse(Site == 6, "Dam", Site_name)
-         ) |>
-  ggplot(aes(x = FakeDate, y = conc_ugL, col = Site_name ))+
+PPCP2 |> 
+  dplyr::mutate(Drug = ifelse(Drug == "ACT", "Acetaminophen", Drug),
+         Drug = ifelse(Drug == "TCS", "Triclosan", Drug),
+         Drug = ifelse(Drug == "CAF", "Caffeine", Drug)
+                  ) |>
+  dplyr::rename(Site = Site_number) |> 
+  mutate(Site = as.numeric(Site)) |> 
+  mutate(Date = mdy(Date),
+         FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))) |> 
+  ggplot(aes(x = FakeDate, y = Conc2, col = as.factor(Site) ))+
   geom_point()+  geom_line()+ 
-  labs(x = "Date", y = "PPCP (ug/L)")+
+  labs(x = "Date", y = expression("Concentration ( "*mu*"g/L)"), color = "Site")+
   scale_y_log10()+
   geom_vline(data = race_days_fakedate, aes(xintercept = intercept_date), linetype = 1)+
-  facet_grid(PPCP~Year, scales = "free_y")+
+  facet_grid(factor(Drug, levels = ppcp_levels)~Year, scales = "free_y")+
   theme_bw()+ theme(legend.position = "top", text = element_text(size = 14),
-                    panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+                    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  guides(color = guide_legend(nrow = 1, byrow = TRUE))
+
 
 
 ```
@@ -178,344 +148,108 @@ ppcp_forplotting |>
 ```{r}
 ccr_met_edi <- read_csv("https://pasta.lternet.edu/package/data/eml/edi/1105/3/df0ce4fc90f220b65c400b997abae37b")
 ccr_dam_edi <- read_csv("https://pasta.lternet.edu/package/data/eml/edi/1069/3/4afb209b30ebed898334badd3819d854" )
-ccr_hobos_edi <- read_csv("https://pasta.lternet.edu/package/data/eml/edi/1069/3/4e83350e4189ec75d49b5ed3cbd766a8")
-ysi <- read_csv("https://pasta.lternet.edu/package/data/eml/edi/198/13/e50a50d062ee73f4d85e4f20b360ce4f")
-chem <- read_csv("https://pasta.lternet.edu/package/data/eml/edi/199/12/a33a5283120c56e90ea414e76d5b7ddb")
 
 ```
 
 
 
-## Meteorology data
+## Format daily data
 
-
+ 
 ```{r}
-
-## format daily
+## format daily Meteo
 ccr_met_daily <- ccr_met_edi |> 
-  select(DateTime, Rain_Total_mm, ShortwaveRadiationUp_Average_W_m2, WindDir_degrees, WindSpeed_Average_m_s) |> 
-  mutate(Date = as.Date(DateTime)) |> 
+  select(DateTime, Rain_Total_mm, ShortwaveRadiationUp_Average_W_m2, WindDir_degrees, WindSpeed_Average_m_s) |>   mutate(Date = as.Date(DateTime)) |> 
   group_by(Date) |> 
-  summarise(Rain_daily_mm = sum(Rain_Total_mm, na.rm = T),
+  dplyr::summarise(Rain_daily_mm = sum(Rain_Total_mm, na.rm = T),
             SW_daily_mean = mean(ShortwaveRadiationUp_Average_W_m2, na.rm = T),
             WindDir_daily_mean = mean(WindDir_degrees, na.rm = T),
             WindSpeed_daily_mean = mean(WindSpeed_Average_m_s, na.rm = T)) 
-  ## These lines work to calc cumulative rain but don't have full year for 2021
-  # mutate(Year = year(Date)) |> 
-  # group_by(Year) |> 
-  # mutate(Rain_season = cumsum(Rain_daily_mm)) 
-
-#plot daily full year
-ccr_met_daily |> 
-  pivot_longer(-1) |> 
-  mutate(Year = year(Date), Month = month(Date), Day = day(Date), 
-         FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))
-         ) |> 
-  filter(Year %in% c(2021,2022,2023)) |> 
-  ggplot(aes(x = FakeDate, y = value, color = as.factor(Year)))+
-  geom_line(size = 1)+
-  facet_wrap(~name, nrow = 1, scales = "free_y")+
-  labs(x = "Date")+ scale_x_date(date_labels = "%b", date_breaks = "2 month")+
-  theme_bw()+ theme(legend.position = "top", text = element_text(size = 16),
-                    panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
 
-#plot daily June
-ccr_met_daily |> 
-  pivot_longer(-1) |> 
-  mutate(Year = year(Date), Month = month(Date), Day = day(Date), 
-         FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))
-         ) |> 
-  filter(FakeDate >= ymd("2030-06-01"), FakeDate <= ymd("2030-06-30")) |> 
-  filter(Year %in% c(2021,2022,2023)) |> 
-  ggplot(aes(x = FakeDate, y = value, color = as.factor(Year)))+
-  geom_line(size = 1)+
-  facet_wrap(~name, nrow = 1, scales = "free_y")+
-  labs(x = "Date")+
-  theme_bw()+ theme(legend.position = "top", #text = element_text(size = 15), legend.text = element_text(size=15),
-                    panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-
-
-
-
-
-
-
-```
-
-
-wind roses 1 min data
-```{r}
-### resources from: https://ropenspain.github.io/climaemet/reference/ggwindrose.html
-
-## full TS
-  ggwindrose(
-  speed = ccr_met_edi$WindSpeed_Average_m_s,
-  direction = ccr_met_edi$WindDir_degrees,
-  #speed_cuts = seq(0, 16, 4),
-  legend_title = "Wind speed (m/s)",
-  calm_wind = 0,
-  n_col = 1,
-  plot_title = "CCR Dam")+
-  labs(subtitle = "2021-03-29 - 2024-12-31")
-
-
-##June 2021
-ccr_met_june21 <- ccr_met_edi |> 
-  filter(DateTime >= ymd("2021-06-01"), DateTime < ymd("2021-07-01"))
-
-  ggwindrose( speed = ccr_met_june21$WindSpeed_Average_m_s,  direction = ccr_met_june21$WindDir_degrees,
-  speed_cuts = seq(0, 16, 4),
-  legend_title = "Wind speed (m/s)",
-  calm_wind = 0,  n_col = 1,
-  plot_title = "CCR Dam")+ labs(subtitle = "June 2021")
-  
-##June 2022
-ccr_met_june22 <- ccr_met_edi |> 
-  filter(DateTime >= ymd("2022-06-01"), DateTime < ymd("2022-07-01"))
-
-  ggwindrose( speed = ccr_met_june22$WindSpeed_Average_m_s,  direction = ccr_met_june22$WindDir_degrees,
-  speed_cuts = seq(0, 16, 4),
-  legend_title = "Wind speed (m/s)",
-  calm_wind = 0,  n_col = 1,
-  plot_title = "CCR Dam")+ labs(subtitle = "June 2022")
-  
-##June 2023
-ccr_met_june23 <- ccr_met_edi |> 
-  filter(DateTime >= ymd("2023-06-01"), DateTime < ymd("2023-07-01"))
-
-  ggwindrose( speed = ccr_met_june23$WindSpeed_Average_m_s,  direction = ccr_met_june23$WindDir_degrees,
-  speed_cuts = seq(0, 16, 4),
-  legend_title = "Wind speed (m/s)",
-  calm_wind = 0,  n_col = 1,
-  plot_title = "CCR Dam")+ labs(subtitle = "June 2023")
-
-## old wind rose
- #  library(openair)
- # chicago_wind = ccr_met%>%
- #   select(DateTime, WindSpeed_Average_m_s, WindDir_degrees)%>%
- #   filter(DateTime >= ymd("2021-05-31"), DateTime <= ymd("2021-06-10")) %>% 
- #   rename(date = DateTime, ws = WindSpeed_Average_m_s, wd = WindDir_degrees)
- # pollutionRose(chicago_wind, pollutant="ws")
-
-```
-
-
-## Dam data
-
-Dam data
-
-```{r}
-
-#format daily 
+#format daily Water Q
 ccr_dam_daily <- ccr_dam_edi |> 
   mutate(Date = as.Date(DateTime)) |> 
   filter(Date > ymd("2021-05-11")) |> 
   #select(Date, ThermistorTemp_C_1, ThermistorTemp_C_2, EXOTemp_C_1, EXOSpCond_uScm_1, EXODO_mgL_1, EXOChla_ugL_1, EXOfDOM_QSU_1, LvlDepth_m_13) |> 
-  select(Date, ThermistorTemp_C_1, ThermistorTemp_C_2, EXOTemp_C_1, EXOSpCond_uScm_1, LvlDepth_m_13) |> 
+  select(Date, ThermistorTemp_C_2, LvlDepth_m_13) |> 
   group_by(Date) |> 
-  summarise(across(ThermistorTemp_C_1:LvlDepth_m_13, ~ mean(.x, na.rm = TRUE), .names = "{col}"))
+  dplyr::summarise(across(ThermistorTemp_C_2:LvlDepth_m_13, ~ mean(.x, na.rm = TRUE), .names = "{col}"))
 
 
-
-#plot Year daily
-ccr_dam_daily |> 
-  select(-ThermistorTemp_C_1, -ThermistorTemp_C_2) |> 
+#Join datasets
+envi_daily <- left_join(ccr_met_daily, ccr_dam_daily, by = "Date") |> 
+  dplyr::select(-WindDir_daily_mean) |> 
+  dplyr::rename(Temp_C = ThermistorTemp_C_2,
+                WaterLevel_m = LvlDepth_m_13,
+                SW_Wm2 = SW_daily_mean,
+                Wind_m_s = WindSpeed_daily_mean) |> 
   pivot_longer(-1) |> 
   mutate(Year = year(Date), Month = month(Date), Day = day(Date), 
          FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))
-         ) |> 
-  filter(Year %in% c(2021,2022,2023)) |> 
-  ggplot(aes(x = FakeDate, y = value, color = as.factor(Year)))+
-  geom_line(size = 1)+
-  geom_vline(xintercept = ymd("2030-06-05"))+
-  facet_wrap(~name, nrow = 1, scales = "free_y")+
-  labs(x = "Date")+ scale_x_date(date_labels = "%b", date_breaks = "2 month")+
-  theme_bw()+ theme(legend.position = "top", text = element_text(size = 16), 
-                    panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-
-
-#plot June daily
-ccr_dam_daily |> 
-  pivot_longer(-1) |> 
-  mutate(Year = year(Date), Month = month(Date), Day = day(Date), 
-         FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))
-         ) |> 
-  filter(FakeDate >= ymd("2030-06-01"), FakeDate <= ymd("2030-06-30"),
-         Year %in% c(2021,2022,2023)) |> 
-  ggplot(aes(x = FakeDate, y = value, color = as.factor(Year)))+
-  geom_line(size = 1)+
-  geom_vline(xintercept = ymd("2030-06-05"))+
-  facet_wrap(~name, nrow = 1, scales = "free_y")+
-  labs(x = "Date")+
-  theme_bw()+ theme(legend.position = "top", #text = element_text(size = 15), 
-                    panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-
+         )  
+  #filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-30"),
+   #      Year %in% c(2021,2022,2023)) 
 
 
 ```
 
-handheld sensors from 2021
-
+envi stats 
 ```{r}
-handhelds2021 <- read.csv("./Data/Field Measurments_YSI_pH_Cond.csv") |> 
-  mutate(Date = as.Date(Date))
+#### 30 days before and after race
+envi21 <- envi_daily |> filter(Date > ymd("2021-06-06") - 30,
+                               Date < ymd("2021-06-06") + 30)
 
-handhelds2021 |> 
-  pivot_longer(-c(1:2)) |> 
-  ggplot(aes(x = Date, y = value, color = as.factor(Site)))+
-  geom_line()+
-  facet_wrap(~name, scales = "free_y")
-
-handheldsjoin <- handhelds2021 |> 
-  group_by(Date) |> 
-    summarise(across(2:8, ~ mean(.x, na.rm = TRUE), .names = "{col}")) |> 
-  rename(SpCond_uScm = Spec_Cond_us_cm) |> 
-  select(Date, Temp_C, SpCond_uScm)
+envi22 <- envi_daily |> filter(Date > ymd("2022-06-05") - 30,
+                               Date < ymd("2022-06-05") + 30)
+                               
+envi23 <- envi_daily |> filter(Date > ymd("2023-06-04") - 30,
+                               Date < ymd("2023-06-04") + 30)
 
 
-##ysi 
-ccrysi50 <- ysi |> 
-  mutate(Date = as.Date(DateTime),
-         Year = year(DateTime),
-         Julian = yday(DateTime)) |> 
-  filter(Reservoir == "CCR",
-         Site == 50,
-         Year %in% c(2021:2023)) |> 
-  ggplot(aes(x = Julian, y = Temp_C, color = Depth_m))+
-  geom_point()+
-  facet_grid(Year~Site)
-  
-ccrysi50
 
-
-```
-
-
-## Meteo and Dam
-
-```{r}
-head(ccr_dam_daily)
-head(ccr_met_daily)
-
-left_join(ccr_met_daily, ccr_dam_daily, by = "Date") |> 
-  select(-c(ThermistorTemp_C_1, ThermistorTemp_C_2)) |> 
-  rename(Temp_C = EXOTemp_C_1,
-         SpCond_uScm = EXOSpCond_uScm_1) |> 
-  plyr::rbind.fill(handheldsjoin) |> 
-  pivot_longer(-1) |> 
-  mutate(Year = year(Date), Month = month(Date), Day = day(Date), 
-         FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))
-         ) |> 
+### May 1 to June 30
+envi_daily |> 
   filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-30"),
          Year %in% c(2021,2022,2023)) |> 
+  dplyr::group_by(name, Year) |> 
+  dplyr::summarise(mean = mean(value, na.rm = T),
+                   sum = sum(value, na.rm = T))
+
+
+#month prior
+envi_daily |> 
+  filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-04"),
+         Year %in% c(2021,2022,2023)) |> 
+  dplyr::group_by(name, Year) |> 
+  dplyr::summarise(mean = mean(value, na.rm = T),
+                   sum = sum(value, na.rm = T))
+  
+
+
+
+```
+
+
+
+## plotting
+
+```{r}
+
+envi_variables <- envi_daily |> 
   ggplot(aes(x = FakeDate, y = value, color = as.factor(Year)))+
   geom_point(size = 2)+
   geom_line(size = 1)+
   geom_vline(xintercept = ymd("2030-06-05"))+
-  facet_wrap(~name, scales = "free_y", ncol = 4)+
-  labs(x = "Date")+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b")+
+  facet_wrap(~factor(name, 
+                     levels = c("Rain_daily_mm", "SW_Wm2", "Wind_m_s", "WaterLevel_m","Temp_C")), 
+             scales = "free_y", ncol = 3)+
+  labs(x = "Date", color = "Year")+
   theme_bw()+ theme(legend.position = "top", text = element_text(size = 16), 
                     panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-
-
-```
-
-################ DATA NOT USING 
-
-
-## E. coli
-
-```{r}
-## read in and format data
-ecoli2023 <- read.csv("E_coli_2023.csv") |> 
-  mutate(Date = mdy(Date))
-
-ecoli2021 <- read.csv("Chemisty (CNP) and E.coli for Ironman.csv") |> 
-  select(Date, Site, Total_coliform_bacteria_MPN, E_coli_bacteria_MPN) |> 
-  mutate(Date = ymd(Date))
-
-#format E. coli so that the "< 1" values are numeric for plotting 
-#I'm going to call "< 1" = 0.1 for the purpose of plotting, we should revisit this 
-ecoli <- rbind(ecoli2021, ecoli2023) |> 
-  filter(!is.na(Total_coliform_bacteria_MPN)) |> 
-  mutate(E_coli_bacteria_MPN = as.numeric(ifelse(E_coli_bacteria_MPN %in% c("< 1", "<1"), 
-                                               0.1, E_coli_bacteria_MPN))) %>% 
-  mutate(Site_text = ifelse(Site == 1, "Race Start (1)", Site),
-         Site_text = ifelse(Site == 2, "Race 2", Site_text),
-         Site_text = ifelse(Site == 3, "Race 3", Site_text),
-         Site_text = ifelse(Site == 4, "Race Finish (4)", Site_text),
-         Site_text = ifelse(Site == 5, "Downstream 1 (5)", Site_text),
-         Site_text = ifelse(Site == 6, "Downstream Dam (6)", Site_text))
-
-
-#plot 
-ecoli |> 
-  select(Date, Site, Site_text, everything()) |> 
-  pivot_longer(-c(1:3)) |> 
-    mutate(Year = year(Date), Month = month(Date), Day = day(Date), 
-         FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))
-         ) |> 
-  ggplot(aes(x = FakeDate, y = value, color = as.factor(Site_text) ))+
-  geom_point(size = 1.5)+
-  geom_line(size = 1)+
-  labs(x = "Date", y = "Bacteria (MPN)", color = "Site")+
-  facet_grid(name~Year, scales = "free_y")+
-  scale_y_log10()+
-    theme_bw()+ theme(legend.position = "top", text = element_text(size = 14),
-                    panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-
-
-```
-
-
-## A lab chem
-
-```{r}
-chem |> 
-  filter(Reservoir == "CCR") |> 
-  mutate(Date = as.Date(DateTime),
-         Julian = yday(Date),
-         Year = year(Date)) |> 
-  filter(Year %in% c(2021,2022,2023),
-         Site < 51) |> 
-  select(Site, Year, Date, Julian, Depth_m, TN_ugL:DOC_mgL) |> 
-  pivot_longer(-c(1:5)) |> 
-  mutate(Month = month(Date), Day = day(Date), 
-         FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))
-         ) |> 
-  #filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-08-30")) |> 
-  ggplot(aes(x = FakeDate, y = value, color = Depth_m, shape = as.factor(Site)))+
-  geom_point()+
-  facet_grid(name~Year, scales = "free_y")+
-  geom_vline(xintercept = ymd("2030-06-05"))+
-  labs(x = "Date")+
-  theme_bw()+ theme(legend.position = "top", text = element_text(size = 16), 
-                    panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-
-
-
-chem |> 
-  filter(Reservoir == "CCR") |> 
-  mutate(Date = as.Date(DateTime),
-         Julian = yday(Date),
-         Year = year(Date)) |> 
-  filter(Year %in% c(2021,2022,2023),
-         Site < 51,
-         Depth_m == 0.1) |> 
-  select(Site, Year, Date, Julian, Depth_m, TN_ugL:DOC_mgL) |> 
-  pivot_longer(-c(1:5)) |> 
-  mutate(Month = month(Date), Day = day(Date), 
-         FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))
-         ) |> 
-  ggplot(aes(x = FakeDate, y = value, color = as.factor(Site)))+
-  geom_point(size = 3)+
-  facet_grid(name~Year, scales = "free_y")+
-  geom_vline(xintercept = ymd("2030-06-05"))+
-  labs(x = "Date")+
-  theme_bw()+ theme(legend.position = "top", text = element_text(size = 16), 
-                    panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+envi_variables
 
 
 ```
