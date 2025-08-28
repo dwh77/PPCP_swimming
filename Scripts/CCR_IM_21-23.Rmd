@@ -207,24 +207,33 @@ envi23 <- envi_daily |> filter(Date > ymd("2023-06-04") - 30,
                                Date < ymd("2023-06-04") + 30)
 
 
+envi <- rbind(envi21, envi22, envi23)
 
-### May 1 to June 30
-envi_daily |> 
-  filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-30"),
-         Year %in% c(2021,2022,2023)) |> 
+envi |> 
   dplyr::group_by(name, Year) |> 
   dplyr::summarise(mean = mean(value, na.rm = T),
-                   sum = sum(value, na.rm = T))
+                   sd = sd(value, na.rm = T),
+            sum = sum(value, na.rm = T))
 
 
-#month prior
-envi_daily |> 
-  filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-04"),
-         Year %in% c(2021,2022,2023)) |> 
-  dplyr::group_by(name, Year) |> 
-  dplyr::summarise(mean = mean(value, na.rm = T),
-                   sum = sum(value, na.rm = T))
-  
+
+# ### May 1 to June 30
+# envi_daily |> 
+#   filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-30"),
+#          Year %in% c(2021,2022,2023)) |> 
+#   dplyr::group_by(name, Year) |> 
+#   dplyr::summarise(mean = mean(value, na.rm = T),
+#                    sum = sum(value, na.rm = T))
+# 
+# 
+# #month prior
+# envi_daily |> 
+#   filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-04"),
+#          Year %in% c(2021,2022,2023)) |> 
+#   dplyr::group_by(name, Year) |> 
+#   dplyr::summarise(mean = mean(value, na.rm = T),
+#                    sum = sum(value, na.rm = T))
+#   
 
 
 
