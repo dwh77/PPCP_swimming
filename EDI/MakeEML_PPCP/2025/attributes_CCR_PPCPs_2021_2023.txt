@@ -1,0 +1,12 @@
+attributeName	attributeDefinition	class	unit	dateTimeFormatString	missingValueCode	missingValueCodeExplanation
+Reservoir	Three-letter code corresponding to sampled reservoir	categorical			NA	value is missing
+Date	Date of sampling	Date		YYYY-MM-DD	NA	value is missing
+Sampling_Day	Categorical code for day sampling occured	categorical			NA	value is missing
+Site	Sampling site at each reservoir	numeric	dimensionless		NA	value is missing
+Depth_m	Water depth where the sample was collected or sensor reading was measured	numeric	meter		NA	value is missing
+ACT_ngL	Acetaminophen concentration	numeric	nanogramsPerLiter		NA	value is missing
+CAF_ngL	Caffeine concentration	numeric	nanogramsPerLiter		NA	value is missing
+TCS_ngL	Triclosan concentration	numeric	nanogramsPerLiter		NA	value is missing
+Flag_ACT_ngL	Data flag for ACT_ngL	categorical	dimensionless		NA	value is missing
+Flag_CAF_ngL	Data flag for CAF_ngL	categorical	dimensionless		NA	value is missing
+Flag_TCS_ngL	Data flag for TCS_ngL	categorical	dimensionless		NA	value is missing

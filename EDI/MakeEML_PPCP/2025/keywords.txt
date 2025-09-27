@@ -1,0 +1,21 @@
+keyword	keywordThesaurus
+Carey Lab 	carey lab controlled vocabulary
+CCR 	carey lab controlled vocabulary
+Virginia Tech	carey lab controlled vocabulary
+Western Virginia Water Authority	carey lab controlled vocabulary
+Carvins Cove Reservoir	carey lab controlled vocabulary
+Reservoir 	cuahsi controlled vocabulary
+Lake	cuahsi controlled vocabulary
+Lakes	lter controlled vocabulary
+water chemistry	lter controlled vocabulary
+water quality	lter controlled vocabulary
+PPCP	carey lab controlled vocabulary
+pharmaceuticals and personal care products	carey lab controlled vocabulary
+caffeine	carey lab controlled vocabulary
+acetaminophen	carey lab controlled vocabulary
+triclosan	carey lab controlled vocabulary
+liquid chromatography mass spectrometry	carey lab controlled vocabulary
+LCMS	carey lab controlled vocabulary
+swimming event	carey lab controlled vocabulary
+ecotoxicology	carey lab controlled vocabulary
+

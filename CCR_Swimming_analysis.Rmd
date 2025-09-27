@@ -17,60 +17,108 @@ library(Rmisc) #summarySE
 Making detection frequency plots for values > LLOD 
 
 ```{r}
-detect <- read.csv("../Data/Detection_frequency_plotting.csv")
 
+#read in data and format
+ppcp_detect_data <- read.csv("./EDI/MakeEML_PPCP/2025/CCR_PPCPs_2021_2023.csv") |> 
+  mutate(Year = year(Date)) |> 
+  mutate(Period = case_when(
+    Sampling_Day == 1 ~ "pre",
+    Sampling_Day %in% 2:4 ~ "post"
+  ))
+
+# Helper function Define detection function
+calc_detection <- function(x) {
+  mean(x %in% c(0, 3)) * 100
+}
+
+
+# Summarize by Year and Sampling Period
+detect_prepost <- ppcp_detect_data %>%
+  filter(!is.na(Period)) %>%
+  group_by(Year, Period) %>%
+  dplyr::summarise(
+    Sample_Size = n(),
+    ACT = calc_detection(Flag_ACT_ngL),
+    TCS = calc_detection(Flag_TCS_ngL),
+    CAF = calc_detection(Flag_CAF_ngL),
+    .groups = "drop"
+  )
+
+# Summarize full year
+detect_full <- ppcp_detect_data %>%
+  group_by(Year) %>%
+  dplyr::summarise(
+    Period = "full_year",
+    Sample_Size = n(),
+    ACT = calc_detection(Flag_ACT_ngL),
+    TCS = calc_detection(Flag_TCS_ngL),
+    CAF = calc_detection(Flag_CAF_ngL),
+    .groups = "drop"
+  )
+
+# Combine and order
+detection_frequency <- bind_rows(detect_prepost, detect_full) %>%
+  arrange(Year, match(Period, c("pre", "post", "full_year")))
+
+
+## Set up plots
 ppcp_levels <- c("Acetaminophen", "Triclosan", "Caffeine")
 
-#before vs after
-detect |> 
+#make plot
+detection_frequency |>
   dplyr::rename(Acetaminophen = ACT,
          Caffeine = CAF,
-         Triclosan = TCS) |> 
-  filter(Detection_frequency != "Full_year") |> #remove rows for full year %s
-  pivot_longer(-c(1:3), names_to = "PPCP", values_to = "value") |> 
-  mutate(value = value*100) |> #change to %
+         Triclosan = TCS) |>
+  dplyr::mutate(Period = ifelse(Period == "pre", "Pre", Period),
+                Period = ifelse(Period == "post", "Post", Period)) |> 
+  filter(Period != "full_year") |> #remove rows for full year 
+  pivot_longer(-c(1:3), names_to = "PPCP", values_to = "value") |>
   mutate(value = ifelse(value == 0, value + 0.5, value)) |> ## add .5 so 0% shows on bars
-  ggplot(aes(x = as.factor(Year), y = value, fill = factor(Detection_frequency, levels = c("Pre", "Post")))) +
-  geom_bar(stat = "identity", width = 0.75, position =  position_dodge(width = 0.75)) +  
+  ggplot(aes(x = as.factor(Year), y = value, fill = factor(Period, levels = c("Pre", "Post")))) +
+  geom_bar(stat = "identity", width = 0.75, position =  position_dodge(width = 0.75)) +
   facet_wrap(~factor(PPCP, ppcp_levels), nrow = 1)+
   labs(x = "Sampling Year", fill = "Sampling Time",
        y = "% of Samples above LLOD")+
    theme_classic()+ theme(legend.position = "top", text = element_text(size = 14),
         axis.text=element_text(size=14), axis.title=element_text(size=14,face="bold"))+
   scale_fill_manual(values=c("#E1BE6a", "#40B0A6"))
-  #scale_fill_manual(values=c("#E66100", "#5D3A9B"))
 
 
 
 ```
 
-## Code from Austin
-
-Read in data and summary stats 
+## summary stats 
 
 ```{r}
 
-PPCP2<- read.csv("../Data/PPCP4.csv",header=T,sep=",")
-PPCP2
+ppcp_data <- read.csv("./EDI/MakeEML_PPCP/2025/CCR_PPCPs_2021_2023.csv")  
 
-
+ppcp_data_summarystats <- ppcp_data |> 
+  mutate(Year = year(Date)) |> 
+  dplyr::mutate(Sampling_Time = ifelse(Sampling_Day == 1, "Before", NA),
+         Sampling_Time = ifelse(Sampling_Day == 2, "During", Sampling_Time),
+         Sampling_Time = ifelse(Sampling_Day %in% c(3,4), "After", Sampling_Time)) |> 
+  dplyr::select(Year, Sampling_Time, ACT_ngL, CAF_ngL, TCS_ngL) |> 
+    pivot_longer(-c(1:2), names_to = "Drug", values_to = "Conc_ngL") |> 
+  mutate(Conc_ugL = Conc_ngL/1000)
+  
+  
 #####Summary stats years compiled#####  ###all data post the race day ("After") is compiled together####
-PPCPsum <- summarySE(data = PPCP2,"Conc2", groupvars=c("Sampling.Time","Drug"))
+PPCPsum <- summarySE(data = ppcp_data_summarystats,"Conc_ugL", groupvars=c("Sampling_Time","Drug"))
 PPCPsum #concn in ug/L##
 
 
 ##SUMMARY STATS SEPARATED BY YEAR, DRUG, SAMPLING POINT###
-PPCPsum1<- summarySE(data = PPCP2,"Conc2", groupvars=c("Sampling.Time","Drug","Year"))
+PPCPsum1<- summarySE(data = ppcp_data_summarystats,"Conc_ugL", groupvars=c("Sampling_Time","Drug","Year"))
 PPCPsum1
 
 PPCPsum1 |> filter(Drug == "CAF")
 
 #yearly 
-summarySE(data = PPCP2,"Conc2", groupvars=c("Drug","Year"))
+summarySE(data = ppcp_data_summarystats,"Conc_ugL", groupvars=c("Drug","Year"))
 
 
-summarySE(data = PPCP2,"Conc2", groupvars=c("Sampling.Time","Drug"))
-
+summarySE(data = ppcp_data_summarystats,"Conc_ugL", groupvars=c("Sampling_Time","Drug"))
 
 ```
 
@@ -78,16 +126,22 @@ Plot for figure 3
 
 ```{r}
 
-#revised with ug levels 
-PPCP2 |> 
-  dplyr::mutate(Drug = ifelse(Drug == "ACT", "Acetaminophen", Drug),
-         Drug = ifelse(Drug == "TCS", "Triclosan", Drug),
-         Drug = ifelse(Drug == "CAF", "Caffeine", Drug)
+ppcp_data |> 
+   mutate(Year = year(Date)) |> 
+  dplyr::mutate(Sampling_Time = ifelse(Sampling_Day == 1, "Before", NA),
+         Sampling_Time = ifelse(Sampling_Day == 2, "During", Sampling_Time),
+         Sampling_Time = ifelse(Sampling_Day %in% c(3,4), "After", Sampling_Time)) |> 
+  dplyr::select(Date, Site, Year, Sampling_Time, ACT_ngL, CAF_ngL, TCS_ngL) |> 
+    pivot_longer(-c(1:4), names_to = "Drug", values_to = "Conc_ngL") |> 
+  mutate(Conc_ugL = Conc_ngL/1000) |> 
+  dplyr::mutate(Drug = ifelse(Drug == "ACT_ngL", "Acetaminophen", Drug),
+         Drug = ifelse(Drug == "TCS_ngL", "Triclosan", Drug),
+         Drug = ifelse(Drug == "CAF_ngL", "Caffeine", Drug)
                   ) |>
-  dplyr::mutate(Sampling_Time = ifelse(Sampling.Time == "Before", "Pre", Sampling.Time),
-                Sampling_Time = ifelse(Sampling.Time == "After ", "Post", Sampling_Time)
+  dplyr::mutate(Sampling_Time = ifelse(Sampling_Time == "Before", "Pre", Sampling_Time),
+                Sampling_Time = ifelse(Sampling_Time == "After", "Post", Sampling_Time)
          ) |> 
-ggplot(aes(x = factor(Sampling_Time, level=c('Pre', 'During', 'Post')), y=Conc2 )) +
+ggplot(aes(x = factor(Sampling_Time, level=c('Pre', 'During', 'Post')), y= Conc_ugL )) +
   geom_boxplot()+
   geom_dotplot(binaxis='y', stackdir='center', dotsize = 1.5)+
   facet_grid(factor(Drug, levels = ppcp_levels)~Year)+
@@ -114,17 +168,24 @@ race_days_fakedate <- data.frame(
   intercept_date = as.Date(c("2030-06-06", "2030-06-05", "2030-06-04"))
 )
 
-
-PPCP2 |> 
-  dplyr::mutate(Drug = ifelse(Drug == "ACT", "Acetaminophen", Drug),
-         Drug = ifelse(Drug == "TCS", "Triclosan", Drug),
-         Drug = ifelse(Drug == "CAF", "Caffeine", Drug)
+ppcp_data |> 
+   mutate(Year = year(Date)) |> 
+  dplyr::mutate(Sampling_Time = ifelse(Sampling_Day == 1, "Before", NA),
+         Sampling_Time = ifelse(Sampling_Day == 2, "During", Sampling_Time),
+         Sampling_Time = ifelse(Sampling_Day %in% c(3,4), "After", Sampling_Time)) |> 
+  dplyr::select(Date, Site, Year, Sampling_Time, ACT_ngL, CAF_ngL, TCS_ngL) |> 
+    pivot_longer(-c(1:4), names_to = "Drug", values_to = "Conc_ngL") |> 
+  mutate(Conc_ugL = Conc_ngL/1000) |> 
+  dplyr::mutate(Drug = ifelse(Drug == "ACT_ngL", "Acetaminophen", Drug),
+         Drug = ifelse(Drug == "TCS_ngL", "Triclosan", Drug),
+         Drug = ifelse(Drug == "CAF_ngL", "Caffeine", Drug)
                   ) |>
-  dplyr::rename(Site = Site_number) |> 
-  mutate(Site = as.numeric(Site)) |> 
-  mutate(Date = mdy(Date),
-         FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))) |> 
-  ggplot(aes(x = FakeDate, y = Conc2, col = as.factor(Site) ))+
+  dplyr::mutate(Sampling_Time = ifelse(Sampling_Time == "Before", "Pre", Sampling_Time),
+                Sampling_Time = ifelse(Sampling_Time == "After", "Post", Sampling_Time)
+         ) |> 
+  mutate(Site = ifelse(Site == 50, 6, Site)) |> 
+  mutate(FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))) |> 
+  ggplot(aes(x = FakeDate, y = Conc_ugL, col = as.factor(Site) ))+
   geom_point()+  geom_line()+ 
   labs(x = "Date", y = expression("Concentration ( "*mu*"g/L)"), color = "Site")+
   scale_y_log10()+

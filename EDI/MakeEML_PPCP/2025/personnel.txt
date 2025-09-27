@@ -1,0 +1,9 @@
+givenName	middleInitial	surName	organizationName	electronicMailAddress	userId	role	projectTitle	fundingAgency	fundingNumber
+Dexter	W.	Howard	Virginia Tech	dwh1998@vt.edu	0000-0002-6118-2149	creator			
+Dexter	W.	Howard	Virginia Tech	dwh1998@vt.edu	0000-0002-6118-2149	contact			
+Kathleen		Irhin	Virginia Tech	kathleengm@vt.edu	0009-0003-3606-0865	creator			
+Austin	D.	Gray	Virginia Tech	austindg@vt.edu	0000-0002-6090-6328	creator			
+Cayelan	C.	Carey	Virginia Tech	Cayelan@vt.edu	0000-0001-8835-4476	creator			
+Cayelan	C.	Carey	Virginia Tech	Cayelan@vt.edu	0000-0001-8835-4476	PI	Collaborative Research: Consequences of changing oxygen availability for carbon cycling in freshwater ecosystems	National Science Foundation	1753639
+Cayelan	C.	Carey	Virginia Tech	Cayelan@vt.edu	0000-0001-8835-4476	PI		Virginia Tech Department of Biological Sciences	
+Austin	D.	Gray	Virginia Tech	austindg@vt.edu	0000-0002-6090-6328	PI		Virginia Tech Department of Biological Sciences	

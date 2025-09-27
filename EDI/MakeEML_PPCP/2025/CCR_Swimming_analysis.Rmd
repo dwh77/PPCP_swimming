@@ -1,0 +1,329 @@
+---
+title: "CCR Triathlon 2021, 2022, 2023"
+author: "Dexter Howard"
+date: "4/10/2025"
+output: html_document
+---
+
+## Load packages
+
+```{r, include=FALSE}
+library(tidyverse)
+library(Rmisc) #summarySE
+
+```
+
+## PPCPs Detect freq
+Making detection frequency plots for values > LLOD 
+
+```{r}
+
+#read in data and format
+ppcp_detect_data <- read.csv("./EDI/MakeEML_PPCP/2025/CCR_PPCPs_2021_2023.csv") |> 
+  mutate(Year = year(Date)) |> 
+  mutate(Period = case_when(
+    Sampling_Day == 1 ~ "pre",
+    Sampling_Day %in% 2:4 ~ "post"
+  ))
+
+# Helper function Define detection function
+calc_detection <- function(x) {
+  mean(x %in% c(0, 3)) * 100
+}
+
+
+# Summarize by Year and Sampling Period
+detect_prepost <- ppcp_detect_data %>%
+  filter(!is.na(Period)) %>%
+  group_by(Year, Period) %>%
+  dplyr::summarise(
+    Sample_Size = n(),
+    ACT = calc_detection(Flag_ACT_ngL),
+    TCS = calc_detection(Flag_TCS_ngL),
+    CAF = calc_detection(Flag_CAF_ngL),
+    .groups = "drop"
+  )
+
+# Summarize full year
+detect_full <- ppcp_detect_data %>%
+  group_by(Year) %>%
+  dplyr::summarise(
+    Period = "full_year",
+    Sample_Size = n(),
+    ACT = calc_detection(Flag_ACT_ngL),
+    TCS = calc_detection(Flag_TCS_ngL),
+    CAF = calc_detection(Flag_CAF_ngL),
+    .groups = "drop"
+  )
+
+# Combine and order
+detection_frequency <- bind_rows(detect_prepost, detect_full) %>%
+  arrange(Year, match(Period, c("pre", "post", "full_year")))
+
+
+## Set up plots
+ppcp_levels <- c("Acetaminophen", "Triclosan", "Caffeine")
+
+#make plot
+detection_frequency |>
+  dplyr::rename(Acetaminophen = ACT,
+         Caffeine = CAF,
+         Triclosan = TCS) |>
+  dplyr::mutate(Period = ifelse(Period == "pre", "Pre", Period),
+                Period = ifelse(Period == "post", "Post", Period)) |> 
+  filter(Period != "full_year") |> #remove rows for full year 
+  pivot_longer(-c(1:3), names_to = "PPCP", values_to = "value") |>
+  mutate(value = ifelse(value == 0, value + 0.5, value)) |> ## add .5 so 0% shows on bars
+  ggplot(aes(x = as.factor(Year), y = value, fill = factor(Period, levels = c("Pre", "Post")))) +
+  geom_bar(stat = "identity", width = 0.75, position =  position_dodge(width = 0.75)) +
+  facet_wrap(~factor(PPCP, ppcp_levels), nrow = 1)+
+  labs(x = "Sampling Year", fill = "Sampling Time",
+       y = "% of Samples above LLOD")+
+   theme_classic()+ theme(legend.position = "top", text = element_text(size = 14),
+        axis.text=element_text(size=14), axis.title=element_text(size=14,face="bold"))+
+  scale_fill_manual(values=c("#E1BE6a", "#40B0A6"))
+
+
+
+```
+
+## summary stats 
+
+```{r}
+
+ppcp_data <- read.csv("./EDI/MakeEML_PPCP/2025/CCR_PPCPs_2021_2023.csv")  
+
+ppcp_data_summarystats <- ppcp_data |> 
+  mutate(Year = year(Date)) |> 
+  dplyr::mutate(Sampling_Time = ifelse(Sampling_Day == 1, "Before", NA),
+         Sampling_Time = ifelse(Sampling_Day == 2, "During", Sampling_Time),
+         Sampling_Time = ifelse(Sampling_Day %in% c(3,4), "After", Sampling_Time)) |> 
+  dplyr::select(Year, Sampling_Time, ACT_ngL, CAF_ngL, TCS_ngL) |> 
+    pivot_longer(-c(1:2), names_to = "Drug", values_to = "Conc_ngL") |> 
+  mutate(Conc_ugL = Conc_ngL/1000)
+  
+  
+#####Summary stats years compiled#####  ###all data post the race day ("After") is compiled together####
+PPCPsum <- summarySE(data = ppcp_data_summarystats,"Conc_ugL", groupvars=c("Sampling_Time","Drug"))
+PPCPsum #concn in ug/L##
+
+
+##SUMMARY STATS SEPARATED BY YEAR, DRUG, SAMPLING POINT###
+PPCPsum1<- summarySE(data = ppcp_data_summarystats,"Conc_ugL", groupvars=c("Sampling_Time","Drug","Year"))
+PPCPsum1
+
+PPCPsum1 |> filter(Drug == "CAF")
+
+#yearly 
+summarySE(data = ppcp_data_summarystats,"Conc_ugL", groupvars=c("Drug","Year"))
+
+
+summarySE(data = ppcp_data_summarystats,"Conc_ugL", groupvars=c("Sampling_Time","Drug"))
+
+```
+
+Plot for figure 3
+
+```{r}
+
+ppcp_data |> 
+   mutate(Year = year(Date)) |> 
+  dplyr::mutate(Sampling_Time = ifelse(Sampling_Day == 1, "Before", NA),
+         Sampling_Time = ifelse(Sampling_Day == 2, "During", Sampling_Time),
+         Sampling_Time = ifelse(Sampling_Day %in% c(3,4), "After", Sampling_Time)) |> 
+  dplyr::select(Date, Site, Year, Sampling_Time, ACT_ngL, CAF_ngL, TCS_ngL) |> 
+    pivot_longer(-c(1:4), names_to = "Drug", values_to = "Conc_ngL") |> 
+  mutate(Conc_ugL = Conc_ngL/1000) |> 
+  dplyr::mutate(Drug = ifelse(Drug == "ACT_ngL", "Acetaminophen", Drug),
+         Drug = ifelse(Drug == "TCS_ngL", "Triclosan", Drug),
+         Drug = ifelse(Drug == "CAF_ngL", "Caffeine", Drug)
+                  ) |>
+  dplyr::mutate(Sampling_Time = ifelse(Sampling_Time == "Before", "Pre", Sampling_Time),
+                Sampling_Time = ifelse(Sampling_Time == "After", "Post", Sampling_Time)
+         ) |> 
+ggplot(aes(x = factor(Sampling_Time, level=c('Pre', 'During', 'Post')), y= Conc_ugL )) +
+  geom_boxplot()+
+  geom_dotplot(binaxis='y', stackdir='center', dotsize = 1.5)+
+  facet_grid(factor(Drug, levels = ppcp_levels)~Year)+
+  scale_y_continuous(trans='log10')+
+  labs( y = expression(bold("Concentration ( "*mu*"g/L)")),
+       x = "Sampling Time")+
+   theme_bw()+ theme(legend.position = "top", text = element_text(size = 14),
+                      panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        axis.text=element_text(size=14), axis.title=element_text(size=14,face="bold"))+
+  stat_summary(fun.y=mean, geom="point", shape=23,
+                   size=3, color="black", fill = "red3")
+
+
+```
+
+
+
+## PPCP timeseries
+
+```{r}
+
+race_days_fakedate <- data.frame(
+  Year = c(2021, 2022, 2023),
+  intercept_date = as.Date(c("2030-06-06", "2030-06-05", "2030-06-04"))
+)
+
+ppcp_data |> 
+   mutate(Year = year(Date)) |> 
+  dplyr::mutate(Sampling_Time = ifelse(Sampling_Day == 1, "Before", NA),
+         Sampling_Time = ifelse(Sampling_Day == 2, "During", Sampling_Time),
+         Sampling_Time = ifelse(Sampling_Day %in% c(3,4), "After", Sampling_Time)) |> 
+  dplyr::select(Date, Site, Year, Sampling_Time, ACT_ngL, CAF_ngL, TCS_ngL) |> 
+    pivot_longer(-c(1:4), names_to = "Drug", values_to = "Conc_ngL") |> 
+  mutate(Conc_ugL = Conc_ngL/1000) |> 
+  dplyr::mutate(Drug = ifelse(Drug == "ACT_ngL", "Acetaminophen", Drug),
+         Drug = ifelse(Drug == "TCS_ngL", "Triclosan", Drug),
+         Drug = ifelse(Drug == "CAF_ngL", "Caffeine", Drug)
+                  ) |>
+  dplyr::mutate(Sampling_Time = ifelse(Sampling_Time == "Before", "Pre", Sampling_Time),
+                Sampling_Time = ifelse(Sampling_Time == "After", "Post", Sampling_Time)
+         ) |> 
+  mutate(Site = ifelse(Site == 50, 6, Site)) |> 
+  mutate(FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))) |> 
+  ggplot(aes(x = FakeDate, y = Conc_ugL, col = as.factor(Site) ))+
+  geom_point()+  geom_line()+ 
+  labs(x = "Date", y = expression("Concentration ( "*mu*"g/L)"), color = "Site")+
+  scale_y_log10()+
+  geom_vline(data = race_days_fakedate, aes(xintercept = intercept_date), linetype = 1)+
+  facet_grid(factor(Drug, levels = ppcp_levels)~Year, scales = "free_y")+
+  theme_bw()+ theme(legend.position = "top", text = element_text(size = 14),
+                    panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  guides(color = guide_legend(nrow = 1, byrow = TRUE))
+
+
+
+```
+
+
+
+
+## Look at Environmental variables 
+
+## Read in EDI data sets
+
+```{r}
+ccr_met_edi <- read_csv("https://pasta.lternet.edu/package/data/eml/edi/1105/3/df0ce4fc90f220b65c400b997abae37b")
+ccr_dam_edi <- read_csv("https://pasta.lternet.edu/package/data/eml/edi/1069/3/4afb209b30ebed898334badd3819d854" )
+
+```
+
+
+
+## Format daily data
+
+ 
+```{r}
+## format daily Meteo
+ccr_met_daily <- ccr_met_edi |> 
+  select(DateTime, Rain_Total_mm, ShortwaveRadiationUp_Average_W_m2, WindDir_degrees, WindSpeed_Average_m_s) |>   mutate(Date = as.Date(DateTime)) |> 
+  group_by(Date) |> 
+  dplyr::summarise(Rain_daily_mm = sum(Rain_Total_mm, na.rm = T),
+            SW_daily_mean = mean(ShortwaveRadiationUp_Average_W_m2, na.rm = T),
+            WindDir_daily_mean = mean(WindDir_degrees, na.rm = T),
+            WindSpeed_daily_mean = mean(WindSpeed_Average_m_s, na.rm = T)) 
+
+
+#format daily Water Q
+ccr_dam_daily <- ccr_dam_edi |> 
+  mutate(Date = as.Date(DateTime)) |> 
+  filter(Date > ymd("2021-05-11")) |> 
+  #select(Date, ThermistorTemp_C_1, ThermistorTemp_C_2, EXOTemp_C_1, EXOSpCond_uScm_1, EXODO_mgL_1, EXOChla_ugL_1, EXOfDOM_QSU_1, LvlDepth_m_13) |> 
+  select(Date, ThermistorTemp_C_2, LvlDepth_m_13) |> 
+  group_by(Date) |> 
+  dplyr::summarise(across(ThermistorTemp_C_2:LvlDepth_m_13, ~ mean(.x, na.rm = TRUE), .names = "{col}"))
+
+
+#Join datasets
+envi_daily <- left_join(ccr_met_daily, ccr_dam_daily, by = "Date") |> 
+  dplyr::select(-WindDir_daily_mean) |> 
+  dplyr::rename(Temp_C = ThermistorTemp_C_2,
+                WaterLevel_m = LvlDepth_m_13,
+                SW_Wm2 = SW_daily_mean,
+                Wind_m_s = WindSpeed_daily_mean) |> 
+  pivot_longer(-1) |> 
+  mutate(Year = year(Date), Month = month(Date), Day = day(Date), 
+         FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))
+         )  
+  #filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-30"),
+   #      Year %in% c(2021,2022,2023)) 
+
+
+```
+
+envi stats 
+```{r}
+#### 30 days before and after race
+envi21 <- envi_daily |> filter(Date > ymd("2021-06-06") - 30,
+                               Date < ymd("2021-06-06") + 30)
+
+envi22 <- envi_daily |> filter(Date > ymd("2022-06-05") - 30,
+                               Date < ymd("2022-06-05") + 30)
+                               
+envi23 <- envi_daily |> filter(Date > ymd("2023-06-04") - 30,
+                               Date < ymd("2023-06-04") + 30)
+
+
+envi <- rbind(envi21, envi22, envi23)
+
+envi |> 
+  dplyr::group_by(name, Year) |> 
+  dplyr::summarise(mean = mean(value, na.rm = T),
+                   sd = sd(value, na.rm = T),
+            sum = sum(value, na.rm = T))
+
+
+
+# ### May 1 to June 30
+# envi_daily |> 
+#   filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-30"),
+#          Year %in% c(2021,2022,2023)) |> 
+#   dplyr::group_by(name, Year) |> 
+#   dplyr::summarise(mean = mean(value, na.rm = T),
+#                    sum = sum(value, na.rm = T))
+# 
+# 
+# #month prior
+# envi_daily |> 
+#   filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-04"),
+#          Year %in% c(2021,2022,2023)) |> 
+#   dplyr::group_by(name, Year) |> 
+#   dplyr::summarise(mean = mean(value, na.rm = T),
+#                    sum = sum(value, na.rm = T))
+#   
+
+
+
+```
+
+
+
+## plotting
+
+```{r}
+
+envi_variables <- envi_daily |> 
+  ggplot(aes(x = FakeDate, y = value, color = as.factor(Year)))+
+  geom_point(size = 2)+
+  geom_line(size = 1)+
+  geom_vline(xintercept = ymd("2030-06-05"))+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b")+
+  facet_wrap(~factor(name, 
+                     levels = c("Rain_daily_mm", "SW_Wm2", "Wind_m_s", "WaterLevel_m","Temp_C")), 
+             scales = "free_y", ncol = 3)+
+  labs(x = "Date", color = "Year")+
+  theme_bw()+ theme(legend.position = "top", text = element_text(size = 16), 
+                    panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+envi_variables
+
+
+```
+
+
+
+

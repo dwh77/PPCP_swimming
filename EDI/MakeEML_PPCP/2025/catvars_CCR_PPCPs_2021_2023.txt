@@ -1,0 +1,16 @@
+attributeName	code	definition
+Reservoir	CCR	Carvins Cove Reservoir
+Sampling_Day	1	Sampling occurred several days prior to the race
+Sampling_Day	2	Sampling occurred within 24 hours of race completion 
+Sampling_Day	3	Sampling occurred several days after the race
+Sampling_Day	4	Sampling occurred multiple weeks after the race
+Flag_ACT_ngL	0	No flag
+Flag_ACT_ngL	1	Measurement below LLOD
+Flag_ACT_ngL	2	"Measurement below LLOD, concentration reported as half the LLOD"
+Flag_CAF_ngL	0	No flag
+Flag_CAF_ngL	1	Measurement below LLOD
+Flag_CAF_ngL	2	"Measurement below LLOD, concentration reported as half the LLOD"
+Flag_TCS_ngL	0	No flag
+Flag_TCS_ngL	1	Measurement below LLOD
+Flag_TCS_ngL	2	"Measurement below LLOD,  concentration reported as half the LLOD"
+Flag_TCS_ngL	3	"Measurement above ULOQ, value set to the ULOQ"
