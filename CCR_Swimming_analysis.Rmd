@@ -65,7 +65,7 @@ detection_frequency <- bind_rows(detect_prepost, detect_full) %>%
 ppcp_levels <- c("Acetaminophen", "Triclosan", "Caffeine")
 
 #make plot
-detection_frequency |>
+detect_freq_plot <- detection_frequency |>
   dplyr::rename(Acetaminophen = ACT,
          Caffeine = CAF,
          Triclosan = TCS) |>
@@ -82,6 +82,10 @@ detection_frequency |>
    theme_classic()+ theme(legend.position = "top", text = element_text(size = 14),
         axis.text=element_text(size=14), axis.title=element_text(size=14,face="bold"))+
   scale_fill_manual(values=c("#E1BE6a", "#40B0A6"))
+
+detect_freq_plot
+
+#ggsave("./Figures/Detection_Frequency.png", detect_freq_plot, height = 4, width = 6, units = "in")
 
 
 
@@ -126,7 +130,7 @@ Plot for figure 3
 
 ```{r}
 
-ppcp_data |> 
+ppcp_boxplots <- ppcp_data |> 
    mutate(Year = year(Date)) |> 
   dplyr::mutate(Sampling_Time = ifelse(Sampling_Day == 1, "Before", NA),
          Sampling_Time = ifelse(Sampling_Day == 2, "During", Sampling_Time),
@@ -155,6 +159,12 @@ ggplot(aes(x = factor(Sampling_Time, level=c('Pre', 'During', 'Post')), y= Conc_
                    size=3, color="black", fill = "red3")
 
 
+ppcp_boxplots
+
+#ggsave("./Figures/PPCP_boxplots.png", ppcp_boxplots, height = 4.5, width = 6, units = "in")
+
+
+
 ```
 
 
@@ -168,7 +178,7 @@ race_days_fakedate <- data.frame(
   intercept_date = as.Date(c("2030-06-06", "2030-06-05", "2030-06-04"))
 )
 
-ppcp_data |> 
+ppcp_timeseries_SI <- ppcp_data |> 
    mutate(Year = year(Date)) |> 
   dplyr::mutate(Sampling_Time = ifelse(Sampling_Day == 1, "Before", NA),
          Sampling_Time = ifelse(Sampling_Day == 2, "During", Sampling_Time),
@@ -194,6 +204,10 @@ ppcp_data |>
   theme_bw()+ theme(legend.position = "top", text = element_text(size = 14),
                     panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   guides(color = guide_legend(nrow = 1, byrow = TRUE))
+
+ppcp_timeseries_SI
+
+# ggsave("./Figures/PPCP_timeseries_SI.png", ppcp_timeseries_SI, height = 6, width = 6, units = "in")
 
 
 
