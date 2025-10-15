@@ -277,7 +277,6 @@ ccr_met_daily <- ccr_met_edi |>
 ccr_dam_daily <- ccr_dam_edi |> 
   mutate(Date = as.Date(DateTime)) |> 
   filter(Date > ymd("2021-05-11")) |> 
-  #select(Date, ThermistorTemp_C_1, ThermistorTemp_C_2, EXOTemp_C_1, EXOSpCond_uScm_1, EXODO_mgL_1, EXOChla_ugL_1, EXOfDOM_QSU_1, LvlDepth_m_13) |> 
   select(Date, ThermistorTemp_C_2, LvlDepth_m_13) |> 
   group_by(Date) |> 
   dplyr::summarise(across(ThermistorTemp_C_2:LvlDepth_m_13, ~ mean(.x, na.rm = TRUE), .names = "{col}"))
@@ -294,8 +293,6 @@ envi_daily <- left_join(ccr_met_daily, ccr_dam_daily, by = "Date") |>
   mutate(Year = year(Date), Month = month(Date), Day = day(Date), 
          FakeDate = ymd(paste("2032", month(Date), day(Date), sep = "-"))
          )  
-  #filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-30"),
-   #      Year %in% c(2021,2022,2023)) 
 
 
 ```
@@ -320,27 +317,6 @@ envi |>
   dplyr::summarise(mean = mean(value, na.rm = T),
                    sd = sd(value, na.rm = T),
             sum = sum(value, na.rm = T))
-
-
-
-# ### May 1 to June 30
-# envi_daily |> 
-#   filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-30"),
-#          Year %in% c(2021,2022,2023)) |> 
-#   dplyr::group_by(name, Year) |> 
-#   dplyr::summarise(mean = mean(value, na.rm = T),
-#                    sum = sum(value, na.rm = T))
-# 
-# 
-# #month prior
-# envi_daily |> 
-#   filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-04"),
-#          Year %in% c(2021,2022,2023)) |> 
-#   dplyr::group_by(name, Year) |> 
-#   dplyr::summarise(mean = mean(value, na.rm = T),
-#                    sum = sum(value, na.rm = T))
-#   
-
 
 
 ```
