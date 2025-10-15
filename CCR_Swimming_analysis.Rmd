@@ -5,6 +5,15 @@ date: "4/10/2025"
 output: html_document
 ---
 
+## Install needed packages 
+
+```{r}
+install.packages("tidyverse")
+install.packages("Rmisc")
+
+```
+
+
 ## Load packages
 
 ```{r, include=FALSE}
@@ -13,26 +22,41 @@ library(Rmisc) #summarySE
 
 ```
 
+
+## Load data
+update file path depending on where EDI download store your data
+
+```{r}
+
+ppcp_data <- read.csv("./EDI/MakeEML_PPCP/2025/CCR_PPCPs_2021_2023.csv")  
+
+```
+
+
+
+
 ## PPCPs Detect freq
 Making detection frequency plots for values > LLOD 
 
 ```{r}
 
-#read in data and format
-ppcp_detect_data <- read.csv("./EDI/MakeEML_PPCP/2025/CCR_PPCPs_2021_2023.csv") |> 
+### Format data for Year and Pre post sampling IDs
+ppcp_detect_data <- ppcp_data |> 
   mutate(Year = year(Date)) |> 
   mutate(Period = case_when(
     Sampling_Day == 1 ~ "pre",
     Sampling_Day %in% 2:4 ~ "post"
-  ))
+  )) 
 
-# Helper function Define detection function
+### Helper function Define detection function
+#This identifying flags that are 0 or 3 (values that were > LLOD), in turn IDing them as true or false (1 or 0),
+#Then takes the mean based on grouping and turns to percent
 calc_detection <- function(x) {
   mean(x %in% c(0, 3)) * 100
 }
 
 
-# Summarize by Year and Sampling Period
+### Summarize by Year and Sampling Period (pre v post)
 detect_prepost <- ppcp_detect_data %>%
   filter(!is.na(Period)) %>%
   group_by(Year, Period) %>%
@@ -44,7 +68,7 @@ detect_prepost <- ppcp_detect_data %>%
     .groups = "drop"
   )
 
-# Summarize full year
+#### Summarize full year detection
 detect_full <- ppcp_detect_data %>%
   group_by(Year) %>%
   dplyr::summarise(
@@ -56,12 +80,19 @@ detect_full <- ppcp_detect_data %>%
     .groups = "drop"
   )
 
-# Combine and order
+#### Combine and order data frames
 detection_frequency <- bind_rows(detect_prepost, detect_full) %>%
   arrange(Year, match(Period, c("pre", "post", "full_year")))
 
 
-## Set up plots
+```
+
+
+Make plot 
+
+```{r}
+
+## set levels for variable facets
 ppcp_levels <- c("Acetaminophen", "Triclosan", "Caffeine")
 
 #make plot
@@ -87,15 +118,13 @@ detect_freq_plot
 
 #ggsave("./Figures/Detection_Frequency.png", detect_freq_plot, height = 4, width = 6, units = "in")
 
-
-
 ```
+
+
 
 ## summary stats 
 
 ```{r}
-
-ppcp_data <- read.csv("./EDI/MakeEML_PPCP/2025/CCR_PPCPs_2021_2023.csv")  
 
 ppcp_data_summarystats <- ppcp_data |> 
   mutate(Year = year(Date)) |> 
@@ -126,7 +155,9 @@ summarySE(data = ppcp_data_summarystats,"Conc_ugL", groupvars=c("Sampling_Time",
 
 ```
 
-Plot for figure 3
+
+## Boxplots of PPCP across year and pre post swimming
+
 
 ```{r}
 
@@ -150,7 +181,7 @@ ggplot(aes(x = factor(Sampling_Time, level=c('Pre', 'During', 'Post')), y= Conc_
   geom_dotplot(binaxis='y', stackdir='center', dotsize = 1.5)+
   facet_grid(factor(Drug, levels = ppcp_levels)~Year)+
   scale_y_continuous(trans='log10')+
-  labs( y = expression(bold("Concentration ( "*mu*"g/L)")),
+  labs( y = expression(bold("Concentration ("*mu*"g/L)")),
        x = "Sampling Time")+
    theme_bw()+ theme(legend.position = "top", text = element_text(size = 14),
                       panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
@@ -169,7 +200,8 @@ ppcp_boxplots
 
 
 
-## PPCP timeseries
+## PPCP timeseries by year, variable, and site
+for SI figure
 
 ```{r}
 
@@ -218,7 +250,7 @@ ppcp_timeseries_SI
 
 ## Look at Environmental variables 
 
-## Read in EDI data sets
+Read in EDI data sets
 
 ```{r}
 ccr_met_edi <- read_csv("https://pasta.lternet.edu/package/data/eml/edi/1105/3/df0ce4fc90f220b65c400b997abae37b")
@@ -227,11 +259,10 @@ ccr_dam_edi <- read_csv("https://pasta.lternet.edu/package/data/eml/edi/1069/3/4
 ```
 
 
+Format daily data
 
-## Format daily data
-
- 
 ```{r}
+
 ## format daily Meteo
 ccr_met_daily <- ccr_met_edi |> 
   select(DateTime, Rain_Total_mm, ShortwaveRadiationUp_Average_W_m2, WindDir_degrees, WindSpeed_Average_m_s) |>   mutate(Date = as.Date(DateTime)) |> 
@@ -261,7 +292,7 @@ envi_daily <- left_join(ccr_met_daily, ccr_dam_daily, by = "Date") |>
                 Wind_m_s = WindSpeed_daily_mean) |> 
   pivot_longer(-1) |> 
   mutate(Year = year(Date), Month = month(Date), Day = day(Date), 
-         FakeDate = ymd(paste("2030", month(Date), day(Date), sep = "-"))
+         FakeDate = ymd(paste("2032", month(Date), day(Date), sep = "-"))
          )  
   #filter(FakeDate >= ymd("2030-05-01"), FakeDate <= ymd("2030-06-30"),
    #      Year %in% c(2021,2022,2023)) 
@@ -320,21 +351,23 @@ envi |>
 
 ```{r}
 
-envi_variables <- envi_daily |> 
+envi_variables <- envi |>
   ggplot(aes(x = FakeDate, y = value, color = as.factor(Year)))+
   geom_point(size = 2)+
   geom_line(size = 1)+
-  geom_vline(xintercept = ymd("2030-06-05"))+
-  scale_x_date(date_breaks = "1 month", date_labels = "%b")+
+  geom_vline(xintercept = ymd("2032-06-05"))+
+  scale_x_date(date_breaks = "15 days", date_labels = "%b %d")+
   facet_wrap(~factor(name, 
                      levels = c("Rain_daily_mm", "SW_Wm2", "Wind_m_s", "WaterLevel_m","Temp_C")), 
              scales = "free_y", ncol = 3)+
   labs(x = "Date", color = "Year")+
-  theme_bw()+ theme(legend.position = "top", text = element_text(size = 16), 
-                    panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  theme_bw()+ theme(legend.position = "top", text = element_text(size = 14), 
+                    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                    axis.text.x = element_text(angle = 65, hjust = 1))
 
 envi_variables
 
+#ggsave("./Figures/EnviVars_timeseries_SI.png", envi_variables, height = 6, width = 8, units = "in")
 
 ```
 
