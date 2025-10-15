@@ -41,7 +41,7 @@ make_eml(
   other.entity.description = c("Data analysis script"),
   user.id = 'ccarey',
   user.domain = 'EDI',
-  package.id = 'edi.1374.2') #reserve new staging environment package id each year
+  package.id = 'edi.1374.3') #reserve new staging environment package id each year
 
 ## Step 8: Check your data product! ####
 # Return to the EDI staging environment (https://portal-s.edirepository.org/nis/home.jsp),

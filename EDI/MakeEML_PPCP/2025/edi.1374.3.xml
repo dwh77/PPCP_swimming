@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml xmlns:eml="https://eml.ecoinformatics.org/eml-2.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.2" packageId="edi.1374.3" xsi:schemaLocation="https://eml.ecoinformatics.org/eml-2.2.0/eml.xsd https://eml.ecoinformatics.org/eml-2.2.0/eml.xsd" system="edi">
+  <access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" scope="document">
+    <allow>
+      <principal>uid=ccarey,o=EDI,dc=edirepository,dc=org</principal>
+      <permission>all</permission>
+    </allow>
+    <allow>
+      <principal>public</principal>
+      <permission>read</permission>
+    </allow>
+  </access>
+  <dataset>
+    <title>Acetaminophen, caffeine, and triclosan concentrations before and after swimming events in Carvins Cove Reservoir, Virginia, USA, 2021-2023</title>
+    <creator>
+      <individualName>
+        <givenName>Dexter</givenName>
+        <givenName>W.</givenName>
+        <surName>Howard</surName>
+      </individualName>
+      <organizationName>Virginia Tech</organizationName>
+      <electronicMailAddress>dwh1998@vt.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0002-6118-2149</userId>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Kathleen</givenName>
+        <surName>Irhin</surName>
+      </individualName>
+      <organizationName>Virginia Tech</organizationName>
+      <electronicMailAddress>kathleengm@vt.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0009-0003-3606-0865</userId>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Austin</givenName>
+        <givenName>D.</givenName>
+        <surName>Gray</surName>
+      </individualName>
+      <organizationName>Virginia Tech</organizationName>
+      <electronicMailAddress>austindg@vt.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0002-6090-6328</userId>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Cayelan</givenName>
+        <givenName>C.</givenName>
+        <surName>Carey</surName>
+      </individualName>
+      <organizationName>Virginia Tech</organizationName>
+      <electronicMailAddress>Cayelan@vt.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0001-8835-4476</userId>
+    </creator>
+    <pubDate>2025-10-15</pubDate>
+    <abstract>
+      <para>The presence and concentration of acetaminophen, caffeine, and triclosan were monitored from 2021 - 2023 in Carvins Cove Reservoir before and after large swimming events. Carvins Cove Reservoir (Roanoke, Virginia) is owned by the Western Virginia Water Authority as a primary drinking water source for Roanoke, Virginia. In June 2021, 2022, and 2023, there were one-day large swimming events hosted in the reservoir. We collected samples every year several days prior to swimming, immediately after swimming, and several days after swimming. In 2022 and 2023, we additionally collected samples three to four weeks after swimming. On each sampling day, we collected water samples for the three compounds at 0.5 m depth at six sites in the reservoir. Samples underwent solid phase extraction and were analyzed using liquid chromatography mass spectrometry (LC/MS). Data on detection and concentration of each compound are reported. &#13;
+</para>
+    </abstract>
+    <keywordSet>
+      <keyword>Carey Lab</keyword>
+      <keyword>CCR</keyword>
+      <keyword>Virginia Tech</keyword>
+      <keyword>Western Virginia Water Authority</keyword>
+      <keyword>Carvins Cove Reservoir</keyword>
+      <keyword>PPCP</keyword>
+      <keyword>pharmaceuticals and personal care products</keyword>
+      <keyword>caffeine</keyword>
+      <keyword>acetaminophen</keyword>
+      <keyword>triclosan</keyword>
+      <keyword>liquid chromatography mass spectrometry</keyword>
+      <keyword>LCMS</keyword>
+      <keyword>swimming event</keyword>
+      <keyword>ecotoxicology</keyword>
+      <keywordThesaurus>carey lab controlled vocabulary</keywordThesaurus>
+    </keywordSet>
+    <keywordSet>
+      <keyword>Reservoir</keyword>
+      <keyword>Lake</keyword>
+      <keywordThesaurus>cuahsi controlled vocabulary</keywordThesaurus>
+    </keywordSet>
+    <keywordSet>
+      <keyword>Lakes</keyword>
+      <keyword>water chemistry</keyword>
+      <keyword>water quality</keyword>
+      <keywordThesaurus>lter controlled vocabulary</keywordThesaurus>
+    </keywordSet>
+    <additionalInfo>
+      <para>Author contribution statement: DWH, ADG, and CCC developed the project idea and sampling. ADG and KI led LCMS analysis. All authors contributed to field sampling.</para>
+      <para>Acknowledgments and historical contributions:</para>
+      <para>We thank the Western Virginia Water Authority and especially Bryan Thompson for allowing access to our field site and facilitating sampling. We thank Alex Hounshell, Adrienne Breef-Pilz, Evelyn Tipper, George Haynie, Whitney Woelmer, Michael Kricheldorf, and Tyler Allen for their assistance with field work. Daniel Todd at the UNCG Triad Mass Spec Facility and Sherry Hildreth at the Virginia Tech Mass Spec Facility analyzed LC-MS samples. &#13;
+</para>
+    </additionalInfo>
+    <intellectualRights>
+      <para>This information is released under the Creative Commons license - Attribution - CC BY (https://creativecommons.org/licenses/by/4.0/). The consumer of these data (\"Data User\" herein) is required to cite it appropriately in any publication that results from its use. The Data User should realize that these data may be actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of these data if any questions about methodology or results occur. Where appropriate, the Data User is encouraged to consider collaboration or co-authorship with the authors. The Data User should realize that misinterpretation of data may occur if used out of context of the original study. While substantial efforts are made to ensure the accuracy of data and associated documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is.\" The Data User should be aware, however, that data are updated periodically and it is the responsibility of the Data User to check for new versions of the data. The data authors and the repository where these data were obtained shall not be liable for damages resulting from any use or misinterpretation of the data. Thank you.&#13;
+</para>
+    </intellectualRights>
+    <coverage>
+      <geographicCoverage>
+        <geographicDescription>Carvins Cove Reservoir is located in Roanoke, Virginia, USA</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-79.978642</westBoundingCoordinate>
+          <eastBoundingCoordinate>-79.944052</eastBoundingCoordinate>
+          <northBoundingCoordinate>37.409127</northBoundingCoordinate>
+          <southBoundingCoordinate>37.365345</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <temporalCoverage>
+        <rangeOfDates>
+          <beginDate>
+            <calendarDate>2021-06-01</calendarDate>
+          </beginDate>
+          <endDate>
+            <calendarDate>2023-06-29</calendarDate>
+          </endDate>
+        </rangeOfDates>
+      </temporalCoverage>
+    </coverage>
+    <maintenance>
+      <description>completed</description>
+    </maintenance>
+    <contact>
+      <individualName>
+        <givenName>Dexter</givenName>
+        <givenName>W.</givenName>
+        <surName>Howard</surName>
+      </individualName>
+      <organizationName>Virginia Tech</organizationName>
+      <electronicMailAddress>dwh1998@vt.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0002-6118-2149</userId>
+    </contact>
+    <methods>
+      <methodStep>
+        <description>
+          <para>We sampled select pharmaceuticals and personal care products (PPCP) compounds (acetaminophen, caffeine, and triclosan) before, during, and after the swimming event across three years. On each sampling day, we collected 1 L of surface water at six sampling sites (described in the csv ‘reservoir_site_descriptions.csv’) in Carvins Cove Reservoir at a standard depth of 0.5 m with a Van Dorn sampler. Samples were collected in critically-cleaned (a procedure to remove organic compounds with sodium hydroxide), amber glass bottles and were stored on ice after collection.</para>
+          <para>Before solid-phase extraction (SPE), water samples were first filtered through 0.7-μm GF/F filters (Whatman) filters, then pH adjusted to 4.0 with a 10% H2SO4 or 10% HCl solution before adding 0.2 g of Na-EDTA (chelating agent). The processed samples were stored in a 4°C refrigerator until extraction, which was completed typically within 24 hours of collection (Gray et al., 2020). A Promochrom SPE-03 automated SPE system was utilized for sample extraction with Oasis HLB 3cc (60mg) cartridges (Waters Corporation, Andover, MA, USA); all extraction chemicals were Optima grade and purchased from Fisher Scientific (Waltham, MA, USA). The SPE extract was then evaporated to dryness under a gentle stream of nitrogen gas and reconstituted with a 50:50 methanol:water solution containing 0.1% formic acid (FA), then transferred into 2-mL amber autosampler vials.  </para>
+          <para>Mass spectrometry analysis of the target analytes (caffeine, acetaminophen, and triclosan) was conducted using two different analytical instruments. For years 2021 and 2022, we used a TSQ Quantum Access triple quadrupole mass spectrometer (Thermo Fisher Scientific; Waltham, MA, USA) coupled to an Acquity Ultra Performance Liquid Chromatography (UPLC) system (Waters Corporation). Our analysis used an Acquity HSS T3 column (50 mm × 2.1 mm, i.d. 1.8 mm) and a binary solvent gradient consisting of Optima grade water containing 0.1% formic acid (mobile phase A) and Optima grade methanol containing 0.1% FA (mobile phase B). For year 3, we used a Shimadzu (Columbia, MD, USA) liquid chromatography-tandem mass spectrometer (LC-MS/MS). This analysis utilized an Acquity HSS T3 column (50 mm × 2.1 mm, i.d. 1.8 mm) and a binary solvent gradient of Optima grade water containing 0.1% formic acid (mobile phase A) and Optima grade acetonitrile (mobile phase B). </para>
+          <para>To assess the quantification, linearity, and precision of our methods, we used reference standards of each analyte purchased from Sigma-Aldrich (99% purity; Allentown, Pennsylvania,USA). Standards of each analyte were prepared in dimethyl sulfoxide (DMSO) or methanol; calibration curves were prepared within 24 hours of analysis (Gray et al., 2020). 13C-labeled caffeine was purchased from Cambridge Laboratories (Tewksbury, Massachusetts, USA) to serve as our internal standard. The analytes were analyzed using electrospray ionization in both positive and negative modes. The method was validated through the estimation of the linearity range using external calibration curves (R2 ≥ 0.99), method detection, and quantification limits. </para>
+          <para>To evaluate changes in concentrations, we set concentrations that exceeded the upper limit of quantification (ULOQ) to the value of the ULOQ for that year's samples (data flagged with a value of 2, see data entities table), and values less than the lower limits of detection (LLOD) were set to half the LLOD for that year (data flagged with a value of 1, see data entities table).</para>
+          <para>We have included an R markdown script (CCR_Swimming_analysis.Rmd) that was used to visualize data and conduct summary statistics for publication.</para>
+          <para/>
+          <para>&#13;
+References</para>
+          <para>&#13;
+Gray, A.D., D. Todd, A. E. Hershey. 2020. The seasonal distribution and concentration of antibiotics in rural streams and drinking wells in the piedmont of North Carolina. Science of the Total Environment. 710. 136286. https://doi.org/10.1016/j.scitotenv.2019.136286&#13;
+</para>
+        </description>
+      </methodStep>
+    </methods>
+    <project>
+      <title>Collaborative Research: Consequences of changing oxygen availability for carbon cycling in freshwater ecosystems</title>
+      <personnel>
+        <individualName>
+          <givenName>Cayelan</givenName>
+          <givenName>C.</givenName>
+          <surName>Carey</surName>
+        </individualName>
+        <organizationName>Virginia Tech</organizationName>
+        <electronicMailAddress>Cayelan@vt.edu</electronicMailAddress>
+        <userId directory="https://orcid.org">https://orcid.org/0000-0001-8835-4476</userId>
+        <role>Principal Investigator</role>
+      </personnel>
+      <funding>National Science Foundation 1753639</funding>
+      <relatedProject>
+        <title>No project title to report</title>
+        <personnel>
+          <individualName>
+            <givenName>Cayelan</givenName>
+            <givenName>C.</givenName>
+            <surName>Carey</surName>
+          </individualName>
+          <organizationName>Virginia Tech</organizationName>
+          <electronicMailAddress>Cayelan@vt.edu</electronicMailAddress>
+          <userId directory="https://orcid.org">https://orcid.org/0000-0001-8835-4476</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>Virginia Tech Department of Biological Sciences</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>No project title to report</title>
+        <personnel>
+          <individualName>
+            <givenName>Austin</givenName>
+            <givenName>D.</givenName>
+            <surName>Gray</surName>
+          </individualName>
+          <organizationName>Virginia Tech</organizationName>
+          <electronicMailAddress>austindg@vt.edu</electronicMailAddress>
+          <userId directory="https://orcid.org">https://orcid.org/0000-0002-6090-6328</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>Virginia Tech Department of Biological Sciences</funding>
+      </relatedProject>
+    </project>
+    <dataTable>
+      <entityName>CCR_PPCPs_2021_2023.csv</entityName>
+      <entityDescription>PPCP dataset</entityDescription>
+      <physical>
+        <objectName>CCR_PPCPs_2021_2023.csv</objectName>
+        <size unit="bytes">2997</size>
+        <authentication method="MD5">78dd8ca53a467e68b73e15a620d4e7e8</authentication>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\r\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>Reservoir</attributeName>
+          <attributeDefinition>Three-letter code corresponding to sampled reservoir</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>CCR</code>
+                    <definition>Carvins Cove Reservoir</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Date</attributeName>
+          <attributeDefinition>Date of sampling</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>YYYY-MM-DD</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Sampling_Day</attributeName>
+          <attributeDefinition>Categorical code for day sampling occured</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>1</code>
+                    <definition>Sampling occurred several days prior to the race</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>2</code>
+                    <definition>Sampling occurred within 24 hours of race completion</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>3</code>
+                    <definition>Sampling occurred several days after the race</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>4</code>
+                    <definition>Sampling occurred multiple weeks after the race</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Site</attributeName>
+          <attributeDefinition>Sampling site at each reservoir</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">50</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Depth_m</attributeName>
+          <attributeDefinition>Water depth where the sample was collected or sensor reading was measured</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>meter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.5</minimum>
+                  <maximum exclusive="false">0.5</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ACT_ngL</attributeName>
+          <attributeDefinition>Acetaminophen concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>nanogramsPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">26379</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>CAF_ngL</attributeName>
+          <attributeDefinition>Caffeine concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>nanogramsPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">26790</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>TCS_ngL</attributeName>
+          <attributeDefinition>Triclosan concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>nanogramsPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">50000</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_ACT_ngL</attributeName>
+          <attributeDefinition>Data flag for ACT_ngL</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>0</code>
+                    <definition>No flag</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>1</code>
+                    <definition>Measurement below LLOD</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>2</code>
+                    <definition>Measurement below LLOD, concentration reported as half the LLOD</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_CAF_ngL</attributeName>
+          <attributeDefinition>Data flag for CAF_ngL</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>0</code>
+                    <definition>No flag</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>1</code>
+                    <definition>Measurement below LLOD</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>2</code>
+                    <definition>Measurement below LLOD, concentration reported as half the LLOD</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_TCS_ngL</attributeName>
+          <attributeDefinition>Data flag for TCS_ngL</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>0</code>
+                    <definition>No flag</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>1</code>
+                    <definition>Measurement below LLOD</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>2</code>
+                    <definition>Measurement below LLOD,  concentration reported as half the LLOD</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>3</code>
+                    <definition>Measurement above ULOQ, value set to the ULOQ</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>66</numberOfRecords>
+    </dataTable>
+    <dataTable>
+      <entityName>reservoir_site_descriptions.csv</entityName>
+      <entityDescription>Description, latitude, and longitude of reservoir sampling sites</entityDescription>
+      <physical>
+        <objectName>reservoir_site_descriptions.csv</objectName>
+        <size unit="bytes">1198</size>
+        <authentication method="MD5">e24fe2f353d444697c4131da902318a0</authentication>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\r\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>Reservoir</attributeName>
+          <attributeDefinition>Three-letter code corresponding to sampled reservoir</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>CCR</code>
+                    <definition>Carvins Cove Reservoir</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Site</attributeName>
+          <attributeDefinition>Sampling site at each reservoir</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">50</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Site_description</attributeName>
+          <attributeDefinition>Description of where the reservoir site is located</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Description of where the reservoir site is located</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Latitude</attributeName>
+          <attributeDefinition>Latitude of the reservoir site</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>degree</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">37.3706</minimum>
+                  <maximum exclusive="false">37.3922</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Longitude</attributeName>
+          <attributeDefinition>Longitude of the reservoir site</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>degree</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">-79.9582</minimum>
+                  <maximum exclusive="false">-79.9471</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>6</numberOfRecords>
+    </dataTable>
+    <otherEntity>
+      <entityName>CCR_Swimming_analysis.Rmd</entityName>
+      <entityDescription>Data analysis script</entityDescription>
+      <physical>
+        <objectName>CCR_Swimming_analysis.Rmd</objectName>
+        <size unit="bytes">11634</size>
+        <authentication method="MD5">1649b449178720b98f47bf63593d8216</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>text/x-markdown</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+  </dataset>
+  <additionalMetadata>
+    <metadata>
+      <unitList>
+        <unit id="nanogramsPerLiter" multiplierToSI="0.000000001" name="nanogramsPerLiter" parentSI="kilogramPerMeterCubed" unitType="massDensity">
+          <description>nanograms/liter</description>
+        </unit>
+      </unitList>
+    </metadata>
+  </additionalMetadata>
+  <additionalMetadata>
+    <metadata>
+      <emlEditor>
+        <app>EMLassemblyline</app>
+        <release>3.5.5</release>
+      </emlEditor>
+    </metadata>
+  </additionalMetadata>
+</eml:eml>
